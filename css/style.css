@@ -195,6 +195,7 @@ html[data-lang="en"] .lang-en { display: inline; }
 
 /* ---------- 区块通用 ---------- */
 .section { padding: 80px 0; }
+section[id] { scroll-margin-top: 84px; }
 .section-alt { background: var(--bg-alt); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .section-title {
   font-family: var(--serif-cjk); font-size: 1.85rem; font-weight: 700;
