@@ -1,23 +1,55 @@
 /* ============================================================
-   交互脚本:双语切换 / 移动端菜单 / 导航高亮 / 滚动渐显 / 年份
+   交互脚本:主题切换 / 双语切换 / 移动端菜单 / 导航高亮
+            / 滚动渐显 / 滚动进度 / 回到顶部 / 年份
    纯原生 JS,无依赖。
    ============================================================ */
 (function () {
   "use strict";
 
   var root = document.documentElement;
-  var STORAGE_KEY = "site-lang";
+  var LANG_KEY = "site-lang";
+  var THEME_KEY = "site-theme";
+
+  /* ---------- 主题切换(深 / 浅) ---------- */
+  var themeBtn = document.getElementById("themeToggle");
+  function getSystemTheme() {
+    return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  }
+  function setTheme(theme) {
+    root.setAttribute("data-theme", theme);
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+  }
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem(THEME_KEY); } catch (e) {}
+  setTheme(savedTheme === "dark" || savedTheme === "light" ? savedTheme : getSystemTheme());
+
+  if (themeBtn) {
+    themeBtn.addEventListener("click", function () {
+      var cur = root.getAttribute("data-theme");
+      setTheme(cur === "dark" ? "light" : "dark");
+    });
+  }
+  // 若用户未手动设定,跟随系统主题变化
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    var onMq = function (e) {
+      var s = null; try { s = localStorage.getItem(THEME_KEY); } catch (err) {}
+      if (s !== "dark" && s !== "light") setTheme(e.matches ? "dark" : "light");
+    };
+    if (mq.addEventListener) mq.addEventListener("change", onMq);
+    else if (mq.addListener) mq.addListener(onMq);
+  }
 
   /* ---------- 双语切换 ---------- */
   var toggle = document.getElementById("langToggle");
   function setLang(lang) {
     root.setAttribute("data-lang", lang);
-    try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) {}
-    document.documentElement.lang = (lang === "en") ? "en" : "zh";
+    try { localStorage.setItem(LANG_KEY, lang); } catch (e) {}
+    root.lang = (lang === "en") ? "en" : "zh";
   }
-  var saved = null;
-  try { saved = localStorage.getItem(STORAGE_KEY); } catch (e) {}
-  setLang(saved === "en" ? "en" : "zh");
+  var savedLang = null;
+  try { savedLang = localStorage.getItem(LANG_KEY); } catch (e) {}
+  setLang(savedLang === "en" ? "en" : "zh");
 
   if (toggle) {
     toggle.addEventListener("click", function () {
@@ -34,7 +66,6 @@
       var open = navLinks.classList.toggle("open");
       navToggle.setAttribute("aria-expanded", open ? "true" : "false");
     });
-    // 点击链接后自动收起
     navLinks.addEventListener("click", function (e) {
       if (e.target.tagName === "A") {
         navLinks.classList.remove("open");
@@ -84,6 +115,18 @@
   }
   window.addEventListener("scroll", onProgress, { passive: true });
   onProgress();
+
+  /* ---------- 回到顶部 ---------- */
+  var toTop = document.getElementById("toTop");
+  if (toTop) {
+    window.addEventListener("scroll", function () {
+      if (window.scrollY > 420) toTop.classList.add("show");
+      else toTop.classList.remove("show");
+    }, { passive: true });
+    toTop.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
 
   /* ---------- 页脚年份 ---------- */
   var yearEl = document.getElementById("year");

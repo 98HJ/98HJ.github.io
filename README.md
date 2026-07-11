@@ -1,6 +1,6 @@
 # 个人学术主页 · Personal Academic Homepage
 
-为**博士 / 研究者**打造的编辑时尚风个人网站。纯静态 HTML/CSS/JS,**无需构建步骤**,原生支持**中英双语切换**,可托管到 GitHub Pages。
+为**博士 / 研究者**打造的编辑时尚风个人网站。纯静态 HTML/CSS/JS,**无需构建步骤**,原生支持**中英双语切换**与**深色 / 浅色主题切换**,可托管到 GitHub Pages。
 
 > 身份:花健(Jian Hua),男,苏州大学 服装设计与工程博士研究生,导师薛哲彬教授。研究方向 Digital Fashion & Wearable Systems。
 > 站名已设为「花健 / Jian Hua」。
@@ -24,7 +24,7 @@ personal-website/
 ## 替换成你自己的内容
 
 ### 1. 姓名与基本信息
-按需更新 `index.html` 里的院系、研究方向、邮箱、GitHub / Scholar 链接(姓名已设为 花健 / Jian Hua)。
+按需更新 `index.html` 里的院系、研究方向、邮箱、GitHub / ORCID / Web of Science 链接（姓名已设为 花健 / Jian Hua）。
 双语内容成对出现,改时两种语言都改,保持对称。
 
 ### 2. 研究兴趣(#research)
@@ -34,14 +34,12 @@ personal-website/
 每个 `<li class="pub">` 是一条论文,填标题、作者、`[PDF]/[Code]/[DOI]` 真实链接;没有的删掉对应 `<a>`。
 
 ### 4. 头像
-把正方形照片命名为 `photo.jpg` 放进 `assets/`,再把 `index.html` 里的
-`<div class="photo-placeholder">…</div>` 整段替换为:
-```html
-<img class="photo-img" src="assets/photo.jpg" alt="花健">
-```
+头像已内联为 base64 data URI,直接写在 `index.html` 的 `<img class="photo-img" src="data:image/jpeg;base64,...">` 中(纯静态托管无需单独上传图片二进制)。
+如需更换:把新照片放进 `assets/photo.jpg`,再把该 `src` 改为 `assets/photo.jpg` 即可;或用 Pillow 重新生成 base64 注入。
 
 ### 5. 改主题色
-`css/style.css` 的 `:root` 里改 `--accent`(默认赤陶 `#a85a3c`)即可换配色。
+`css/style.css` 的 `:root` 里改 `--accent`(默认赤陶 `#a85a3c`)即可换配色;深色主题配色在 `[data-theme="dark"]` 块中,可一并调整。
+右上角 ☀ / 🌙 按钮切换深 / 浅色,选择会被记住(localStorage),未手动设定时跟随系统偏好。
 
 ### 6. 写新笔记
 复制 `blog/post-1.html` 改标题与内容;别忘了在主页「笔记」区块和 `blog/index.html` 各加一张卡片。

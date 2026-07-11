@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh" data-lang="zh">
+<html lang="zh" data-lang="zh" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,7 +13,10 @@
 <body>
   <header class="site-header" id="top">
     <nav class="nav container">
-      <a class="nav-brand" href="../index.html">花健 <span class="brand-en">Jian Hua</span></a>
+      <a class="nav-brand" href="../index.html">
+        <span class="nav-monogram" aria-hidden="true">HJ</span>
+        <span>花健 <span class="brand-en">Jian Hua</span></span>
+      </a>
       <button class="nav-toggle" id="navToggle" aria-label="菜单 / Menu" aria-expanded="false"><span></span><span></span><span></span></button>
       <ul class="nav-links" id="navLinks">
         <li><a href="../index.html#about"><span class="lang-zh">关于</span><span class="lang-en">About</span></a></li>
@@ -23,7 +26,13 @@
         <li><a href="../index.html#news"><span class="lang-zh">动态</span><span class="lang-en">News</span></a></li>
         <li><a href="../index.html#contact"><span class="lang-zh">联系</span><span class="lang-en">Contact</span></a></li>
       </ul>
-      <button class="lang-toggle" id="langToggle" aria-label="切换语言 / Switch language"><span class="lang-zh">EN</span><span class="lang-en">中</span></button>
+      <div class="nav-tools">
+        <button class="theme-toggle" id="themeToggle" aria-label="切换主题 / Toggle theme" title="切换深色 / 浅色">
+          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <button class="lang-toggle" id="langToggle" aria-label="切换语言 / Switch language"><span class="lang-zh">EN</span><span class="lang-en">中</span></button>
+      </div>
     </nav>
   </header>
 
@@ -65,11 +74,36 @@
   </main>
 
   <footer class="site-footer">
-    <div class="container">
-      <p>© <span id="year"></span> <span class="lang-zh">花健</span><span class="lang-en">Jian Hua</span>. <span class="lang-zh">保留所有权利。</span><span class="lang-en">All rights reserved.</span></p>
-      <p class="muted"><a href="../index.html"><span class="lang-zh">返回主页</span><span class="lang-en">Back to homepage</span></a></p>
+    <div class="container footer-inner">
+      <div class="footer-copy">
+        <p>© <span id="year"></span> <span class="lang-zh">花健</span><span class="lang-en">Jian Hua</span>. <span class="lang-zh">保留所有权利。</span><span class="lang-en">All rights reserved.</span></p>
+        <p class="muted"><a href="../index.html"><span class="lang-zh">返回主页</span><span class="lang-en">Back to homepage</span></a></p>
+      </div>
+      <nav class="social" aria-label="社交链接 / Social links">
+        <a href="https://orcid.org/0009-0001-9173-520X" target="_blank" rel="noopener" aria-label="ORCID" class="social-orcid">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><text x="12" y="16" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#fff" font-weight="700">iD</text></svg>
+          <span class="sr-only">ORCID</span>
+        </a>
+        <a href="https://www.webofscience.com/wos/author/record/KWT-4826-2024" target="_blank" rel="noopener" aria-label="Web of Science">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></g></svg>
+          <span class="sr-only">Web of Science</span>
+        </a>
+        <a href="https://github.com/98HJ" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.86.09-.66.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.04 10.04 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>
+          <span class="sr-only">GitHub</span>
+        </a>
+        <a href="mailto:jhua1014@163.com" aria-label="Email">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></g></svg>
+          <span class="sr-only">Email</span>
+        </a>
+      </nav>
     </div>
   </footer>
+
+  <button class="to-top" id="toTop" aria-label="回到顶部 / Back to top" title="回到顶部">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
   <script src="../js/main.js"></script>
 </body>
 </html>
