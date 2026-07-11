@@ -225,17 +225,37 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
 
 /* ---------- 论文列表 ---------- */
 .pub-list { list-style: none; margin: 14px 0 0; padding: 0; }
-.pub { display: grid; grid-template-columns: 70px 1fr; gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--line); }
-.pub-meta { font-family: var(--serif); font-weight: 600; color: var(--accent); }
+.pub {
+  position: relative; display: grid; grid-template-columns: 88px 1fr; gap: 24px;
+  align-items: start; background: var(--card); border: 1px solid var(--line);
+  border-radius: 14px; padding: 24px 26px; margin-bottom: 16px;
+  transition: box-shadow .25s, transform .25s, border-color .25s;
+}
+.pub::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--accent); border-radius: 14px 0 0 14px; opacity: 0; transition: opacity .25s;
+}
+.pub:hover { box-shadow: 0 14px 34px var(--shadow); transform: translateY(-2px); border-color: transparent; }
+.pub:hover::before { opacity: 1; }
+.pub-meta {
+  font-family: var(--serif); font-weight: 700; font-size: 1.5rem; line-height: 1;
+  color: var(--accent); padding-top: 2px;
+}
 .pub-tag {
   display: inline-block; font-size: .68rem; letter-spacing: .08em; text-transform: uppercase;
   color: var(--accent); background: var(--accent-soft); border: 1px solid var(--line);
-  padding: 2px 9px; border-radius: 999px; margin: 0 0 8px;
+  padding: 3px 11px; border-radius: 999px; margin: 0 0 10px;
 }
 .pub-tag--preprint { color: var(--muted); background: var(--bg-alt); }
-.pub-title { margin: 0 0 4px; font-weight: 400; }
-.pub-authors { margin: 0 0 6px; color: var(--muted); font-size: .92rem; }
-.pub-links a { font-size: .88rem; margin-right: 14px; }
+.pub-title { margin: 0 0 6px; font-weight: 500; font-size: 1.06rem; line-height: 1.5; color: var(--ink); }
+.pub-authors { margin: 0 0 12px; color: var(--muted); font-size: .9rem; }
+.pub-links { margin: 0; }
+.pub-links a {
+  display: inline-block; font-size: .8rem; margin-right: 8px;
+  padding: 3px 12px; border: 1px solid var(--line); border-radius: 999px;
+  color: var(--accent); transition: background .2s, border-color .2s, color .2s;
+}
+.pub-links a:hover { background: var(--accent); border-color: var(--accent); color: #fff; text-decoration: none; }
 
 /* ---------- 笔记 / 博客 ---------- */
 .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
@@ -254,15 +274,31 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
 .blog-more { font-size: .85rem; color: var(--accent); padding: 0 18px 18px; font-weight: 400; }
 
 /* ---------- 动态时间线 ---------- */
-.timeline { list-style: none; margin: 16px 0 0; padding: 0; border-left: 2px solid var(--line); }
-.timeline li { position: relative; padding: 0 0 24px 26px; }
-.timeline li::before {
-  content: ""; position: absolute; left: -7px; top: 8px; width: 12px; height: 12px; border-radius: 50%;
-  background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft);
+.timeline { list-style: none; margin: 20px 0 0; padding: 0; position: relative; }
+.timeline::before {
+  content: ""; position: absolute; left: 96px; top: 6px; bottom: 6px; width: 2px; background: var(--line);
 }
-.timeline li:first-child::before { background: var(--accent-dark); box-shadow: 0 0 0 4px var(--accent-soft); }
-.tl-date { font-family: var(--serif); font-weight: 600; color: var(--accent); margin-right: 10px; }
-.tl-text { color: var(--ink); }
+.timeline li {
+  position: relative; display: grid; grid-template-columns: 96px 1fr; gap: 28px;
+  align-items: baseline; padding: 0 0 22px 0;
+}
+.timeline li::before {
+  content: ""; position: absolute; left: 90px; top: 9px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--card); border: 3px solid var(--accent); z-index: 1;
+}
+.timeline li:first-child::before { background: var(--accent); }
+.tl-date {
+  font-family: var(--serif); font-weight: 700; color: var(--accent); font-size: .98rem;
+  text-align: right; white-space: nowrap;
+}
+.tl-text { color: var(--ink); padding-left: 6px; }
+@media (max-width: 560px) {
+  .timeline::before { left: 5px; }
+  .timeline li { grid-template-columns: 1fr; gap: 2px; padding-left: 28px; }
+  .timeline li::before { left: 0; top: 7px; }
+  .tl-date { text-align: left; margin-bottom: 2px; }
+  .tl-text { padding-left: 0; }
+}
 
 /* Center Publications & News (these sections intentionally omit .container) */
 #publications > div, #news > div { max-width: var(--max-width); margin: 0 auto; padding: 0 28px; }
