@@ -14,6 +14,8 @@
 </head>
 <body>
 
+  <div class="scroll-progress" id="scrollProgress"></div>
+
   <!-- ===== 顶部导航 ===== -->
   <header class="site-header" id="top">
     <nav class="nav container">
@@ -60,14 +62,7 @@
           </div>
         </div>
         <div class="hero-photo reveal">
-          <!-- 头像占位：把 assets/photo.jpg 放好后改用 <img class="photo-img" src="assets/photo.jpg" alt="花健"> -->
-          <div class="photo-placeholder" aria-hidden="true">
-            <svg viewBox="0 0 200 200" width="100%" height="100%" role="img" aria-label="photo placeholder">
-              <rect width="200" height="200" fill="#f0e7e1"/>
-              <circle cx="100" cy="78" r="38" fill="#d8c3b8"/>
-              <path d="M40 175c0-33 27-55 60-55s60 22 60 55z" fill="#d8c3b8"/>
-            </svg>
-          </div>
+          <img class="photo-img" src="assets/photo.jpg" alt="花健">
           <span class="photo-ring" aria-hidden="true"></span>
         </div>
       </div>
@@ -160,13 +155,14 @@
     <section class="section section-alt" id="publications">
       <div>
         <h2 class="section-title reveal"><span class="lang-zh">论文发表</span><span class="lang-en">Publications</span></h2>
-        <p class="muted reveal"><span class="lang-zh">按时间倒序排列。带 * 表示共同第一作者。</span><span class="lang-en">Ordered by date (newest first). * denotes equal contribution.</span></p>
+        <p class="muted reveal"><span class="lang-zh">按时间倒序排列。带 * 表示共同第一作者。标题为占位,请替换为真实论文。</span><span class="lang-en">Ordered by date (newest first). * denotes equal contribution. Titles are placeholders — swap in your real papers.</span></p>
         <ol class="pub-list">
           <li class="pub reveal">
             <div class="pub-meta">2026</div>
             <div class="pub-body">
-              <p class="pub-title">论文标题占位:面向虚拟试穿的服装皱褶实时仿真</p>
-              <p class="pub-authors">花健*, 合作者 A*, 薛哲彬. <em>会议/期刊名称</em>, 2026.</p>
+              <span class="pub-tag"><span class="lang-zh">期刊</span><span class="lang-en">Journal</span></span>
+              <p class="pub-title"><span class="lang-zh">论文标题占位:面向虚拟试穿的服装皱褶实时仿真</span><span class="lang-en">Placeholder Title: Real-Time Garment Wrinkle Simulation for Virtual Try-On</span></p>
+              <p class="pub-authors"><span class="lang-zh">花健*, 合作者 A*, 薛哲彬. <em>期刊名称</em>, 2026.</span><span class="lang-en">Jian Hua*, Collaborator A*, Zhebin Xue. <em>Journal Name</em>, 2026.</span></p>
               <p class="pub-links">
                 <a href="#" aria-label="PDF">[PDF]</a>
                 <a href="#" aria-label="Code">[Code]</a>
@@ -177,11 +173,23 @@
           <li class="pub reveal">
             <div class="pub-meta">2025</div>
             <div class="pub-body">
-              <p class="pub-title">Paper Title Placeholder: Real-Time Garment Wrinkle Simulation for Virtual Try-On</p>
-              <p class="pub-authors">Jian Hua, Collaborator A, Zhebin Xue. <em>Venue Name</em>, 2025.</p>
+              <span class="pub-tag"><span class="lang-zh">会议</span><span class="lang-en">Conference</span></span>
+              <p class="pub-title"><span class="lang-zh">论文标题占位:柔性织物传感器的动作识别</span><span class="lang-en">Placeholder Title: Motion Recognition with Flexible Textile Sensors</span></p>
+              <p class="pub-authors"><span class="lang-zh">花健, 合作者 B, 薛哲彬. <em>会议名称</em>, 2025.</span><span class="lang-en">Jian Hua, Collaborator B, Zhebin Xue. <em>Conference Name</em>, 2025.</span></p>
               <p class="pub-links">
                 <a href="#" aria-label="PDF">[PDF]</a>
                 <a href="#" aria-label="Code">[Code]</a>
+              </p>
+            </div>
+          </li>
+          <li class="pub reveal">
+            <div class="pub-meta">2024</div>
+            <div class="pub-body">
+              <span class="pub-tag pub-tag--preprint"><span class="lang-zh">预印本</span><span class="lang-en">Preprint</span></span>
+              <p class="pub-title"><span class="lang-zh">论文标题占位:生成式设计驱动的参数化服装</span><span class="lang-en">Placeholder Title: Parametric Garment Generation via Generative Design</span></p>
+              <p class="pub-authors"><span class="lang-zh">花健, 薛哲彬. <em>arXiv</em>, 2024.</span><span class="lang-en">Jian Hua, Zhebin Xue. <em>arXiv</em>, 2024.</span></p>
+              <p class="pub-links">
+                <a href="#" aria-label="PDF">[PDF]</a>
               </p>
             </div>
           </li>
@@ -235,6 +243,10 @@
         <h2 class="section-title reveal"><span class="lang-zh">近期动态</span><span class="lang-en">News</span></h2>
         <ul class="timeline">
           <li class="reveal">
+            <span class="tl-date">2026.07</span>
+            <span class="tl-text"><span class="lang-zh">个人学术主页正式上线(GitHub Pages / CloudStudio)。</span><span class="lang-en">Personal academic homepage went live (GitHub Pages / CloudStudio).</span></span>
+          </li>
+          <li class="reveal">
             <span class="tl-date">2026.06</span>
             <span class="tl-text"><span class="lang-zh">进入苏州大学服装设计与工程攻读博士学位(导师:薛哲彬教授)。</span><span class="lang-en">Joined the Ph.D. program in Fashion Design &amp; Engineering at Soochow University (Advisor: Prof. Xue Zhebin).</span></span>
           </li>
@@ -256,7 +268,7 @@
         <h2 class="section-title reveal"><span class="lang-zh">联系方式</span><span class="lang-en">Contact</span></h2>
         <ul class="contact-list reveal">
           <li><span class="contact-label">Email</span><a href="mailto:jhua1014@163.com">jhua1014@163.com</a></li>
-          <li><span class="contact-label">GitHub</span><a href="https://github.com/98HJ" target="_blank" rel="noopener">github.com/98HJ</a></li>
+          <li><span class="contact-label">GitHub</span><a href="https://github.com/jhua" target="_blank" rel="noopener">github.com/jhua</a></li>
           <li><span class="contact-label">Scholar</span><a href="#" target="_blank" rel="noopener">scholar.google.com/yourname</a></li>
           <li><span class="contact-label"><span class="lang-zh">地址</span><span class="lang-en">Address</span></span><span>Soochow University, School of Fashion Design &amp; Engineering · Suzhou, China</span></li>
         </ul>
@@ -267,7 +279,7 @@
   <footer class="site-footer">
     <div class="container">
       <p>© <span id="year"></span> <span class="lang-zh">花健</span><span class="lang-en">Jian Hua</span>. <span class="lang-zh">保留所有权利。</span><span class="lang-en">All rights reserved.</span></p>
-      <p class="muted"><span class="lang-zh">纯静态网页构建,可托管于 GitHub Pages。</span><span class="lang-en">Built with plain static HTML/CSS/JS. Host on GitHub Pages.</span></p>
+      <p class="muted"><span class="lang-zh">纯静态网页构建,托管于 GitHub Pages。</span><span class="lang-en">Built with plain static HTML/CSS/JS. Hosted on GitHub Pages.</span></p>
     </div>
   </footer>
 

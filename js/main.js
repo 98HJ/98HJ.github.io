@@ -73,6 +73,18 @@
     revealEls.forEach(function (el) { el.classList.add("is-visible"); });
   }
 
+  /* ---------- 滚动进度条 ---------- */
+  var progress = document.getElementById("scrollProgress");
+  function onProgress() {
+    if (!progress) return;
+    var doc = document.documentElement;
+    var h = doc.scrollHeight - window.innerHeight;
+    var pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    progress.style.width = pct + "%";
+  }
+  window.addEventListener("scroll", onProgress, { passive: true });
+  onProgress();
+
   /* ---------- 页脚年份 ---------- */
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
