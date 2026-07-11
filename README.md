@@ -1,9 +1,9 @@
 # 个人学术主页 · Personal Academic Homepage
 
-为**准博士研究生 / 在读博士**打造的编辑时尚风个人网站。纯静态 HTML/CSS/JS,**无需构建步骤**,原生支持**中英双语切换**,可托管到 GitHub Pages。
+为**博士 / 研究者**打造的编辑时尚风个人网站。纯静态 HTML/CSS/JS,**无需构建步骤**,原生支持**中英双语切换**,可托管到 GitHub Pages。
 
-> 示例身份:苏州大学 服装设计与工程博士(准),研究方向 Digital Fashion & Wearable Systems。
-> 站名暂用「华建 / Hua Jian」(取自本地 git 配置),如与你的真实姓名不符,请全局替换。
+> 身份:花健(Jian Hua),男,苏州大学 服装设计与工程博士研究生,导师薛哲彬教授;本科电子信息工程,硕士材料与化工。研究方向 Digital Fashion & Wearable Systems。
+> 站名已设为「花健 / Jian Hua」。
 
 ## 目录结构
 
@@ -12,7 +12,7 @@ personal-website/
 ├── index.html          # 主页面(双语用 .lang-zh / .lang-en 区分)
 ├── css/style.css       # 样式表(主色在 :root 的 --accent)
 ├── js/main.js          # 交互:语言切换 / 移动端菜单 / 导航高亮 / 滚动渐显
-├── assets/             # 放头像 photo.jpg、简历 cv.pdf
+├── assets/             # 放头像 photo.jpg
 ├── blog/               # 笔记/博客
 │   ├── index.html      # 归档页
 │   ├── post-1.html     # 示例文章 1(数字时尚)
@@ -24,7 +24,7 @@ personal-website/
 ## 替换成你自己的内容
 
 ### 1. 姓名与基本信息
-全局替换 `华建` / `Hua Jian`,以及 `index.html` 里的院系、研究方向、邮箱 `jhua1014@163.com`、GitHub / Scholar 链接。
+按需更新 `index.html` 里的院系、研究方向、邮箱、GitHub / Scholar 链接(姓名已设为 花健 / Jian Hua)。
 双语内容成对出现,改时两种语言都改,保持对称。
 
 ### 2. 研究兴趣(#research)
@@ -37,17 +37,16 @@ personal-website/
 把正方形照片命名为 `photo.jpg` 放进 `assets/`,再把 `index.html` 里的
 `<div class="photo-placeholder">…</div>` 整段替换为:
 ```html
-<img class="photo-img" src="assets/photo.jpg" alt="华建">
+<img class="photo-img" src="assets/photo.jpg" alt="花健">
 ```
 
-### 5. 简历(CV)
-简历命名为 `cv.pdf` 放进 `assets/`,「下载简历」按钮即可生效。
-
-### 6. 改主题色
+### 5. 改主题色
 `css/style.css` 的 `:root` 里改 `--accent`(默认赤陶 `#a85a3c`)即可换配色。
 
-### 7. 写新笔记
+### 6. 写新笔记
 复制 `blog/post-1.html` 改标题与内容;别忘了在主页「笔记」区块和 `blog/index.html` 各加一张卡片。
+
+> 站点当前未含「简历 / CV」独立板块(如需,可在 `index.html` 末尾联系板块前加一个 `<section id="cv">`,并把 `cv.pdf` 放进 `assets/`)。
 
 ## 本地预览
 
