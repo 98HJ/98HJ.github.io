@@ -263,6 +263,9 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
 .tl-date { font-family: var(--serif); font-weight: 600; color: var(--accent); margin-right: 10px; }
 .tl-text { color: var(--ink); }
 
+/* Center Publications & News (these sections intentionally omit .container) */
+#publications > div, #news > div { max-width: var(--max-width); margin: 0 auto; padding: 0 28px; }
+
 /* ---------- 联系方式 ---------- */
 .contact-list { list-style: none; margin: 16px 0 0; padding: 0; }
 .contact-list li { display: flex; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--line); }
