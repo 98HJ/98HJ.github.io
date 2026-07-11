@@ -361,4 +361,3 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
   overflow-x: auto; font-size: .85rem; line-height: 1.6; margin: 0 0 20px;
 }
 .code-block code { background: none; color: inherit; padding: 0; font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
-
