@@ -34,8 +34,8 @@ personal-website/
 每个 `<li class="pub">` 是一条论文,填标题、作者、`[PDF]/[Code]/[DOI]` 真实链接;没有的删掉对应 `<a>`。
 
 ### 4. 头像
-头像已内联为 base64 data URI,直接写在 `index.html` 的 `<img class="photo-img" src="data:image/jpeg;base64,...">` 中(纯静态托管无需单独上传图片二进制)。
-如需更换:把新照片放进 `assets/photo.jpg`,再把该 `src` 改为 `assets/photo.jpg` 即可;或用 Pillow 重新生成 base64 注入。
+头像以 base64 data URI 形式存放在 `assets/avatar.js`(由脚本从 `assets/photo.jpg` 生成,`index.html` 末尾引入后注入 `id="siteAvatar"` 的 `<img>`)。纯静态托管无需单独上传图片二进制。
+如需更换:把新照片放进 `assets/photo.jpg`,用 Pillow 重新生成 `assets/avatar.js` 即可(见仓库内 `_gen_avatar_js.py`)。
 
 ### 5. 改主题色
 `css/style.css` 的 `:root` 里改 `--accent`(默认赤陶 `#a85a3c`)即可换配色;深色主题配色在 `[data-theme="dark"]` 块中,可一并调整。
