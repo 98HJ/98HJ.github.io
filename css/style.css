@@ -274,31 +274,15 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
 .blog-more { font-size: .85rem; color: var(--accent); padding: 0 18px 18px; font-weight: 400; }
 
 /* ---------- 动态时间线 ---------- */
-.timeline { list-style: none; margin: 20px 0 0; padding: 0; position: relative; }
-.timeline::before {
-  content: ""; position: absolute; left: 96px; top: 6px; bottom: 6px; width: 2px; background: var(--line);
-}
-.timeline li {
-  position: relative; display: grid; grid-template-columns: 96px 1fr; gap: 28px;
-  align-items: baseline; padding: 0 0 22px 0;
-}
+.timeline { list-style: none; margin: 16px 0 0; padding: 0; border-left: 2px solid var(--line); }
+.timeline li { position: relative; padding: 0 0 24px 26px; }
 .timeline li::before {
-  content: ""; position: absolute; left: 90px; top: 9px; width: 14px; height: 14px; border-radius: 50%;
-  background: var(--card); border: 3px solid var(--accent); z-index: 1;
+  content: ""; position: absolute; left: -7px; top: 8px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft);
 }
-.timeline li:first-child::before { background: var(--accent); }
-.tl-date {
-  font-family: var(--serif); font-weight: 700; color: var(--accent); font-size: .98rem;
-  text-align: right; white-space: nowrap;
-}
-.tl-text { color: var(--ink); padding-left: 6px; }
-@media (max-width: 560px) {
-  .timeline::before { left: 5px; }
-  .timeline li { grid-template-columns: 1fr; gap: 2px; padding-left: 28px; }
-  .timeline li::before { left: 0; top: 7px; }
-  .tl-date { text-align: left; margin-bottom: 2px; }
-  .tl-text { padding-left: 0; }
-}
+.timeline li:first-child::before { background: var(--accent-dark); box-shadow: 0 0 0 4px var(--accent-soft); }
+.tl-date { font-family: var(--serif); font-weight: 600; color: var(--accent); margin-right: 10px; }
+.tl-text { color: var(--ink); }
 
 /* Center Publications & News (these sections intentionally omit .container) */
 #publications > div, #news > div { max-width: var(--max-width); margin: 0 auto; padding: 0 28px; }
