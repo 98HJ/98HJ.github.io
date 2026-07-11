@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh" data-lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>用 Three.js 做一个可旋转的 3D 虚拟服装展示 · 华建</title>
+  <meta name="description" content="从 GLTF 模型加载到 orbit 控制器,几行代码在网页里转起一件衣服。A rotatable 3D garment viewer with Three.js." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <header class="site-header" id="top">
+    <nav class="nav container">
+      <a class="nav-brand" href="../index.html">华建 <span class="brand-en">Hua Jian</span></a>
+      <button class="nav-toggle" id="navToggle" aria-label="菜单 / Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="../index.html#about"><span class="lang-zh">关于</span><span class="lang-en">About</span></a></li>
+        <li><a href="../index.html#research"><span class="lang-zh">研究</span><span class="lang-en">Research</span></a></li>
+        <li><a href="../index.html#publications"><span class="lang-zh">论文</span><span class="lang-en">Publications</span></a></li>
+        <li><a href="../index.html#notes"><span class="lang-zh">笔记</span><span class="lang-en">Notes</span></a></li>
+        <li><a href="../index.html#news"><span class="lang-zh">动态</span><span class="lang-en">News</span></a></li>
+        <li><a href="../index.html#cv"><span class="lang-zh">简历</span><span class="lang-en">CV</span></a></li>
+        <li><a href="../index.html#contact"><span class="lang-zh">联系</span><span class="lang-en">Contact</span></a></li>
+      </ul>
+      <button class="lang-toggle" id="langToggle" aria-label="切换语言 / Switch language"><span class="lang-zh">EN</span><span class="lang-en">中</span></button>
+    </nav>
+  </header>
+
+  <main>
+    <article class="section container post">
+      <a class="post-back" href="../index.html#notes">← <span class="lang-zh">返回笔记</span><span class="lang-en">Back to Notes</span></a>
+      <p class="post-meta">2026.07 · <span class="lang-zh">数字时尚</span><span class="lang-en">Digital Fashion</span></p>
+      <h1 class="post-title"><span class="lang-zh">用 Three.js 做一个可旋转的 3D 虚拟服装展示</span><span class="lang-en">A Rotatable 3D Garment Viewer with Three.js</span></h1>
+
+      <div class="prose">
+        <p>
+          <span class="lang-zh">把一件服装放进网页里自由旋转,是数字时尚最直观的呈现方式之一。借助 Three.js,这件事比想象中简单:加载模型、加灯光、挂一个轨道控制器即可。</span>
+          <span class="lang-en">Putting a garment into a web page and letting it spin freely is one of the most intuitive forms of digital fashion. With Three.js it is simpler than it looks: load a model, add lights, attach an orbit controller.</span>
+        </p>
+
+        <h2><span class="lang-zh">最小可用代码</span><span class="lang-en">Minimal Code</span></h2>
+        <p>
+          <span class="lang-zh">先准备一个 <code>.gltf</code> 或 <code>.glb</code> 服装模型(可从 Clo3D / Marvelous Designer 导出),然后用 <code>GLTFLoader</code> 加载,并用 <code>OrbitControls</code> 实现鼠标拖拽旋转。</span>
+          <span class="lang-en">Prepare a <code>.gltf</code> or <code>.glb</code> garment model (export from Clo3D / Marvelous Designer), load it with <code>GLTFLoader</code>, and enable drag-to-rotate with <code>OrbitControls</code>.</span>
+        </p>
+        <pre class="code-block"><code>import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+camera.position.set(0, 1, 3);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(w, h); document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+new GLTFLoader().load('garment.glb', g => scene.add(g.scene));</code></pre>
+
+        <h2><span class="lang-zh">再加一点质感</span><span class="lang-en">A Touch of Material</span></h2>
+        <p>
+          <span class="lang-zh">服装材质很吃灯光。给场景加一盏环境光加一盏方向光,并把模型材质设为略带粗糙度的 <code>MeshStandardMaterial</code>,布料的褶皱感会更真实。</span>
+          <span class="lang-en">Garments are light-hungry. Add an ambient light plus a directional light, and use a slightly rough <code>MeshStandardMaterial</code> so the fabric folds read more convincingly.</span>
+        </p>
+        <p>
+          <span class="lang-zh">到此,一个可旋转的虚拟服装展示就完成了。后续可以叠加换色、换面料、甚至接动作捕捉做虚拟人试穿。</span>
+          <span class="lang-en">That's a rotatable virtual garment viewer. Next you can layer on color/fabric swaps, or even motion-capture-driven virtual try-on.</span>
+        </p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© <span id="year"></span> 华建 Hua Jian. <span class="lang-zh">保留所有权利。</span><span class="lang-en">All rights reserved.</span></p>
+      <p class="muted"><a href="../index.html"><span class="lang-zh">返回主页</span><span class="lang-en">Back to homepage</span></a></p>
+    </div>
+  </footer>
+  <script src="../js/main.js"></script>
+</body>
+</html>
