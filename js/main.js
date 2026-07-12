@@ -132,17 +132,75 @@
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* ---------- 3D 头像交互:指针倾斜 + 视差 ---------- */
+  /* ---------- 3D 头像交互:指针倾斜(通过 CSS 变量驱动) + 空闲旋转 ---------- */
   var heroPhoto = document.querySelector(".hero-photo");
   var stage = document.querySelector(".photo-3d");
   var reduce3d = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (heroPhoto && stage && !reduce3d) {
+    var MAX_TILT = 14;
     heroPhoto.addEventListener("pointermove", function (e) {
       var r = heroPhoto.getBoundingClientRect();
       var px = (e.clientX - r.left) / r.width - 0.5;
       var py = (e.clientY - r.top) / r.height - 0.5;
-      stage.style.transform = "rotateY(" + (px * 18).toFixed(2) + "deg) rotateX(" + (-py * 18).toFixed(2) + "deg)";
+      stage.style.setProperty("--rx", (-py * MAX_TILT).toFixed(2) + "deg");
+      stage.style.setProperty("--ry", (px * MAX_TILT).toFixed(2) + "deg");
     });
-    heroPhoto.addEventListener("pointerleave", function () { stage.style.transform = ""; });
+    heroPhoto.addEventListener("pointerleave", function () {
+      stage.style.setProperty("--rx", "0deg");
+      stage.style.setProperty("--ry", "0deg");
+    });
+  }
+  /* ---------- 社交分享 ---------- */
+  var SHARE_URL = "https://98HJ.github.io/";
+  var SHARE_TITLE = document.title || "花健 · 个人主页 | Jian Hua";
+  var SHARE_DESC = "苏州大学服装设计与工程博士研究生 · 数字时尚与可穿戴系统";
+  function enc(s) { return encodeURIComponent(s); }
+
+  /* 平台链接 */
+  var shareLinks = {
+    shareWeibo:   "https://service.weibo.com/share/share.php?url=" + enc(SHARE_URL) + "&title=" + enc(SHARE_TITLE),
+    shareTwitter: "https://twitter.com/intent/tweet?url=" + enc(SHARE_URL) + "&text=" + enc(SHARE_TITLE),
+    shareLinkedin: "https://www.linkedin.com/sharing/share-offsite/?url=" + enc(SHARE_URL),
+    shareFacebook: "https://www.facebook.com/sharer/sharer.php?u=" + enc(SHARE_URL)
+  };
+  Object.keys(shareLinks).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el && !el.href) el.href = shareLinks[id];
+  });
+
+  /* Web Share API (系统原生分享) */
+  var nativeBtn = document.getElementById("shareNative");
+  if (nativeBtn) {
+    if (navigator.share) {
+      nativeBtn.addEventListener("click", function () {
+        navigator.share({ title: SHARE_TITLE, text: SHARE_DESC, url: SHARE_URL }).catch(function () {});
+      });
+    } else {
+      nativeBtn.style.display = "none"; // 不支持则隐藏
+    }
+  }
+
+  /* 复制链接 */
+  var copyBtn = document.getElementById("shareCopy");
+  var toastEl = document.getElementById("shareToast");
+  if (copyBtn && toastEl) {
+    copyBtn.addEventListener("click", function () {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(SHARE_URL).then(function () { showToast(); }).catch(fallbackCopy);
+      } else { fallbackCopy(); }
+    });
+    function fallbackCopy() {
+      var ta = document.createElement("textarea");
+      ta.value = SHARE_URL; ta.style.cssText = "position:fixed;opacity:0;";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); showToast(); } catch (_) {}
+      document.body.removeChild(ta);
+    }
+    function showToast() {
+      toastEl.textContent = root.getAttribute("data-lang") === "en" ? "Link copied!" : "链接已复制！";
+      toastEl.classList.add("show");
+      clearTimeout(toastEl._t);
+      toastEl._t = setTimeout(function () { toastEl.classList.remove("show"); }, 2200);
+    }
   }
 })();
