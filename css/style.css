@@ -203,7 +203,7 @@ html[data-lang="en"] .lang-en { display: inline; }
 /* ---------- 页脚访客统计 ---------- */
 .visitor { margin-top: 14px; font-size: .8rem; color: var(--muted); }
 .visitor .lang-en { margin-left: 2px; }
-.visitor #busuanzi_value_site_uv, .visitor #busuanzi_value_site_pv { color: var(--accent); font-weight: 600; }
+.visitor #siteUv, .visitor #sitePv { color: var(--accent); font-weight: 600; }
 
 /* ---------- 笔记评论区(Giscus) ---------- */
 .comments { padding: 52px 0 8px; }

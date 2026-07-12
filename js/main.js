@@ -183,31 +183,86 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- Hero 点赞按钮(本地存储,纯前端无需后端) ---------- */
+  /* ---------- 全局点赞 + 访客统计(CountAPI,零后端、跨访客累计) ---------- */
+  var COUNTAPI = "https://api.countapi.xyz";
+  var NS = "jianhua-site";
+
+  function capiHit(ns, key) {
+    return fetch(COUNTAPI + "/hit/" + ns + "/" + key).then(function (r) { return r.json(); });
+  }
+  function capiGet(ns, key) {
+    return fetch(COUNTAPI + "/get/" + ns + "/" + key).then(function (r) { return r.json(); });
+  }
+
+  // 全局点赞:每个浏览器仅计一次,计数跨所有访客累加
   var likeBtn = document.getElementById("likeBtn");
+  var likeCount = document.getElementById("likeCount");
   if (likeBtn) {
-    var likeCount = document.getElementById("likeCount");
     var LIKE_KEY = "site-liked";
-    var LIKE_BASE = 128; // 展示用基数(非全局服务器统计;真实全局数见页脚访客统计)
-    function paintLiked(liked) {
-      likeBtn.classList.toggle("liked", liked);
-      likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
-      if (likeCount) likeCount.textContent = String(LIKE_BASE + (liked ? 1 : 0));
-    }
-    var stored = false;
-    try { stored = localStorage.getItem(LIKE_KEY) === "1"; } catch (e) {}
-    paintLiked(stored);
+    var liked = false;
+    try { liked = localStorage.getItem(LIKE_KEY) === "1"; } catch (e) {}
+    likeBtn.classList.toggle("liked", liked);
+    likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
+    // 先展示当前全局总数
+    capiGet(NS, "likes").then(function (d) {
+      if (d && typeof d.value === "number" && likeCount) likeCount.textContent = String(d.value);
+    }).catch(function () {});
     likeBtn.addEventListener("click", function () {
-      var liked = !likeBtn.classList.contains("liked");
-      try { localStorage.setItem(LIKE_KEY, liked ? "1" : "0"); } catch (e) {}
-      paintLiked(liked);
-      if (liked) {
-        likeBtn.classList.remove("pop");
-        void likeBtn.offsetWidth; // 重启动画
-        likeBtn.classList.add("pop");
-      }
+      if (liked) return; // 已点过:不重复计数
+      liked = true;
+      try { localStorage.setItem(LIKE_KEY, "1"); } catch (e) {}
+      likeBtn.classList.add("liked");
+      likeBtn.setAttribute("aria-pressed", "true");
+      likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
+      capiHit(NS, "likes").then(function (d) {
+        if (d && typeof d.value === "number" && likeCount) likeCount.textContent = String(d.value);
+      }).catch(function () {});
     });
   }
+
+  // 访客统计(全局 UV / PV;本地 file:// 或离线时显示 —)
+  var uvEl = document.getElementById("siteUv");
+  var pvEl = document.getElementById("sitePv");
+  if (pvEl) {
+    capiHit(NS, "site-pv").then(function (d) {
+      if (d && typeof d.value === "number") pvEl.textContent = String(d.value);
+    }).catch(function () {});
+  }
+  if (uvEl) {
+    var uvSeen = false;
+    try { uvSeen = localStorage.getItem("site-uv-seen") === "1"; } catch (e) {}
+    var done = function (d) { if (d && typeof d.value === "number") uvEl.textContent = String(d.value); };
+    if (uvSeen) {
+      capiGet(NS, "site-uv").then(done).catch(function () {});
+    } else {
+      capiHit(NS, "site-uv").then(function (d) {
+        done(d);
+        try { localStorage.setItem("site-uv-seen", "1"); } catch (e) {}
+      }).catch(function () {});
+    }
+  }
+
+  // Giscus 评论区跟随站点深 / 浅主题
+  function syncGiscusTheme(theme) {
+    var f = document.querySelector("iframe.giscus-frame");
+    if (f && f.contentWindow) {
+      f.contentWindow.postMessage({ giscus: { setConfig: { theme: theme } } }, "https://giscus.app");
+    }
+  }
+  var _themeBtn = document.getElementById("themeToggle");
+  if (_themeBtn) {
+    _themeBtn.addEventListener("click", function () {
+      var t = document.documentElement.getAttribute("data-theme");
+      syncGiscusTheme(t === "dark" ? "dark" : "light");
+    });
+  }
+  // 初次加载后尝试同步(iframe 可能稍晚就绪,找到即停止轮询)
+  var _giscusTries = 15;
+  (function tryGiscus() {
+    var f = document.querySelector("iframe.giscus-frame");
+    if (f) { syncGiscusTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light"); return; }
+    if (_giscusTries-- > 0) setTimeout(tryGiscus, 700);
+  })();
 
   // 标记脚本已初始化(供子页面兜底脚本判断,避免渐显元素因脚本未加载而永久隐藏)
   window.__siteReady = true;
