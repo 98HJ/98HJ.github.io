@@ -194,6 +194,36 @@
     return fetch(COUNTAPI + "/get/" + ns + "/" + key).then(function (r) { return r.json(); });
   }
 
+  // 点赞粒子迸发(纯 CSS 动画 + JS 生成,尊重 reduced-motion)
+  function spawnParticles(btn) {
+    if (!btn) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var host = btn.querySelector(".like-heart");
+    if (!host) return;
+    var n = 8;
+    var colors = ["#a85a3c", "#d98c6a", "#e0533d", "#f0c5b0"];
+    for (var i = 0; i < n; i++) {
+      var p = document.createElement("span");
+      p.className = "like-particle";
+      var angle = (Math.PI * 2 * i) / n + (Math.random() * 0.5 - 0.25);
+      var dist = 24 + Math.random() * 20;
+      p.style.setProperty("--bx", (Math.cos(angle) * dist).toFixed(1) + "px");
+      p.style.setProperty("--by", (Math.sin(angle) * dist).toFixed(1) + "px");
+      p.style.background = colors[i % colors.length];
+      var sz = (5 + Math.random() * 4).toFixed(1);
+      p.style.width = sz + "px";
+      p.style.height = sz + "px";
+      host.appendChild(p);
+      void p.offsetWidth;
+      p.classList.add("is-on");
+      (function (node) {
+        var remove = function () { if (node.parentNode) node.parentNode.removeChild(node); };
+        node.addEventListener("animationend", remove);
+        setTimeout(remove, 800);
+      })(p);
+    }
+  }
+
   // 全局点赞:每个浏览器仅计一次,计数跨所有访客累加
   var likeBtn = document.getElementById("likeBtn");
   var likeCount = document.getElementById("likeCount");
@@ -214,6 +244,7 @@
       likeBtn.classList.add("liked");
       likeBtn.setAttribute("aria-pressed", "true");
       likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
+      spawnParticles(likeBtn);
       capiHit(NS, "likes").then(function (d) {
         if (d && typeof d.value === "number" && likeCount) likeCount.textContent = String(d.value);
       }).catch(function () {});
