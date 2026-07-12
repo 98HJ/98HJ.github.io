@@ -183,51 +183,6 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- 研究方向聚焦(hero 交互) ---------- */
-  var focusPills = document.querySelectorAll(".focus-pill");
-  if (focusPills.length) {
-    var researchSec = document.getElementById("research");
-    var focusDesc = document.getElementById("focusDesc");
-    var focusData = {
-      "card-1": {
-        zh: "3D 服装建模、虚拟试穿与生成式设计——把衣服变成可计算、可迭代的数字资产。",
-        en: "3D garment modeling, virtual try-on and generative design — garments as computable, iterable assets."
-      },
-      "card-2": {
-        zh: "柔性传感、智能织物与人体信号采集——让服装成为可感知的界面。",
-        en: "Flexible sensing, smart textiles and human-signal acquisition — garments as sensing interfaces."
-      },
-      "card-3": {
-        zh: "结合电子与材料背景,研发可穿戴的柔性电路与器件。",
-        en: "Bridging electronics and materials to build flexible circuits and devices for wearables."
-      }
-    };
-    function clearFocus() {
-      document.querySelectorAll(".card").forEach(function (c) { c.classList.remove("focused", "dimmed"); });
-      focusPills.forEach(function (p) { p.classList.remove("active"); });
-    }
-    focusPills.forEach(function (pill) {
-      pill.addEventListener("click", function () {
-        var target = pill.getAttribute("data-target");
-        if (pill.classList.contains("active")) { clearFocus(); return; }
-        clearFocus();
-        pill.classList.add("active");
-        document.querySelectorAll(".card").forEach(function (c) {
-          if (c.id === target) c.classList.add("focused");
-          else c.classList.add("dimmed");
-        });
-        var d = focusData[target];
-        if (d && focusDesc) {
-          var zh = focusDesc.querySelector(".lang-zh");
-          var en = focusDesc.querySelector(".lang-en");
-          if (zh) zh.textContent = d.zh;
-          if (en) en.textContent = d.en;
-        }
-        if (researchSec) researchSec.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    });
-  }
-
   // 标记脚本已初始化(供子页面兜底脚本判断,避免渐显元素因脚本未加载而永久隐藏)
   window.__siteReady = true;
 })();
