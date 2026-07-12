@@ -183,27 +183,61 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- 点赞 + 访客统计(本地优先 / CountAPI 可选增强) ---------- */
+  /* ---------- 全局统计(LeanCloud 国际版 · 国内可达 · 免费) ---------- */
   /*
-   * 设计原则:
-   * 1) 本地 localStorage 为主:点赞数/PV/UV 刷新后保留,离线完整可用
-   * 2) CountAPI 为可选增强:仅当 DNS 可达且返回有效值时,才把本地值对齐到全局
-   * 3) 命名空间统一为 "jianhua-site"(注意拼写)
-   *
-   * 注: api.countapi.xyz 在中国大陆常被墙(ERR_NAME_NOT_RESOLVED),
-   *    此时所有统计自动降级为纯本地模式,不影响用户体验。
+   * 真值源:LeanCloud(跨所有访客共享点赞/PV/UV);兜底:localStorage(离线或未配置时)。
+   * 用户在 LeanCloud 国际版(https://leancloud.app)建应用后,把 AppID / AppKey 填到下方常量。
+   * 控制台需把站点域名加入「设置 → 安全 → Web 安全域名」,否则浏览器请求被拒(CORS/403)。
+   * 未填写或不可达时,自动降级为 localStorage 本地模式(刷新不丢,但不跨设备共享)。
    */
-  var COUNTAPI = "https://api.countapi.xyz";
-  var NS = "jianhua-site"; // 统一命名空间(注意: j-i-a-n-h-u-a)
+  var LC_APP_ID  = "____FILL_APP_ID____";    // ← 替换为你的 LeanCloud App ID
+  var LC_APP_KEY = "____FILL_APP_KEY____";   // ← 替换为你的 LeanCloud App Key(前端只用 AppKey,勿用 Master Key)
+  var LC_API = "https://api.leancloud.app/1.1";
+  var LC_CLASS = "SiteStat";                 // 统计类,首次写入自动创建,无需后台预建
+  var LC_READY = LC_APP_ID.indexOf("____") !== 0 && LC_APP_ID.length > 8;
 
-  function capiHit(ns, key) {
-    return fetch(COUNTAPI + "/hit/" + ns + "/" + key).then(function (r) { return r.json(); });
+  function lcHeaders() {
+    return { "X-LC-Id": LC_APP_ID, "X-LC-Key": LC_APP_KEY, "Content-Type": "application/json" };
   }
-  function capiGet(ns, key) {
-    return fetch(COUNTAPI + "/get/" + ns + "/" + key).then(function (r) { return r.json(); });
+  function lcEnabled() { return LC_READY; }
+  // 找或建统计对象,返回 Promise<objectId>
+  function lcEnsure(key) {
+    if (!lcEnabled()) return Promise.reject("lc-disabled");
+    var url = LC_API + "/classes/" + LC_CLASS + "?where=" + encodeURIComponent(JSON.stringify({ key: key }));
+    return fetch(url, { headers: lcHeaders() }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d.results && d.results.length) return d.results[0].objectId;
+      return fetch(LC_API + "/classes/" + LC_CLASS, {
+        method: "POST", headers: lcHeaders(),
+        body: JSON.stringify({ key: key, count: 0, ACL: { "*": { read: true, write: true } } })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        if (!d.objectId) throw new Error("lc-create-failed");
+        return d.objectId;
+      });
+    });
   }
-  function capiUpdate(ns, key, value) {
-    return fetch(COUNTAPI + "/update/" + ns + "/" + key + "/" + encodeURIComponent(value)).then(function (r) { return r.json(); });
+  // 原子增减,返回新值(LeanCloud Increment 操作并发安全)
+  function lcIncr(key, delta) {
+    if (!lcEnabled()) return Promise.reject("lc-disabled");
+    return lcEnsure(key).then(function (id) {
+      return fetch(LC_API + "/classes/" + LC_CLASS + "/" + id, {
+        method: "PUT", headers: lcHeaders(),
+        body: JSON.stringify({ count: { "__op": "Increment", "amount": delta } })
+      }).then(function (r) { return r.json(); }).then(function (d) {
+        if (typeof d.count !== "number") throw new Error("lc-incr-no-count");
+        return d.count;
+      });
+    });
+  }
+  // 读取当前值
+  function lcGet(key) {
+    if (!lcEnabled()) return Promise.reject("lc-disabled");
+    return lcEnsure(key).then(function (id) {
+      return fetch(LC_API + "/classes/" + LC_CLASS + "/" + id, { headers: lcHeaders() })
+        .then(function (r) { return r.json(); }).then(function (d) {
+          if (typeof d.count !== "number") throw new Error("lc-get-no-count");
+          return d.count;
+        });
+    });
   }
 
   // ====== 点赞粒子迸发 ======
@@ -307,21 +341,20 @@
     likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
     renderLikes(localLikes);
 
-    // 后台尝试拉取全局值(仅当 CountAPI 可达时才覆盖本地值)
-    capiGet(NS, "likes").then(function (d) {
-      if (d && typeof d.value === "number" && d.value >= 0) {
-        localLikes = d.value; saveLikes(); renderLikes(localLikes);
-      }
-    }).catch(function () {
-      /* CountAPI 不可达(被墙/离线):保持本地值,不做任何事 */
-    });
+    // 后台用 LeanCloud 全局值覆盖本地(未配置/不可达时跳过,保留本地值)
+    if (lcEnabled()) {
+      lcGet("likes").then(function (v) {
+        if (typeof v === "number" && v >= 0) { localLikes = v; saveLikes(); renderLikes(v); }
+      }).catch(function () {});
+    }
 
-    // 取消写入全局失败时的回滚
+    // 取消写入全局失败时的回滚(恢复本地已赞状态与计数)
     function revertLike() {
       liked = true;
       try { localStorage.setItem(LIKE_KEY, "1"); } catch (e) {}
       likeBtn.classList.add("liked");
       likeBtn.setAttribute("aria-pressed", "true");
+      localLikes = Math.max(0, localLikes + 1); renderLikes(localLikes); saveLikes();
     }
     likeBtn.addEventListener("click", function () {
       liked = !liked;
@@ -331,35 +364,30 @@
       likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
 
       if (liked) {
-        // 点赞:本地立即 +1 并持久化 → 刷新后仍在
+        // 本地立即 +1 并持久化(刷新不丢),同时全局 +1
         localLikes += 1; renderLikes(localLikes); saveLikes();
         spawnParticles(likeBtn);
         celebrateLike(likeBtn);
-        // 后台尝试同步到 CountAPI(失败静默忽略)
-        capiHit(NS, "likes").then(function (d) {
-          if (d && typeof d.value === "number") { localLikes = d.value; saveLikes(); renderLikes(localLikes); }
-        }).catch(function () {});
+        if (lcEnabled()) {
+          lcIncr("likes", 1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); }).catch(function () {});
+        }
       } else {
         // 取消:本地立即 -1 并持久化
         localLikes = Math.max(0, localLikes - 1); renderLikes(localLikes); saveLikes();
-        // 后台尝试把全局值 -1(失败则回滚本地状态)
-        capiGet(NS, "likes").then(function (d) {
-          var v = (d && typeof d.value === "number") ? d.value : 0;
-          if (v <= 0) return;
-          return capiUpdate(NS, "likes", v - 1);
-        }).then(function (d) {
-          if (d && typeof d.value === "number") { localLikes = d.value; saveLikes(); renderLikes(localLikes); }
-          else if (d !== undefined) { revertLike(); }
-        }).catch(function () { revertLike(); });
+        // 后台全局 -1(仅 LeanCloud 启用;失败回滚本地状态)
+        if (lcEnabled()) {
+          lcIncr("likes", -1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); })
+            .catch(function () { revertLike(); });
+        }
       }
     });
   }
 
-  // ====== 访客统计(本地优先:PV 每次访问+1 / UV 首次访问标记;CountAPI 可选增强) ======
+  // ====== 访客统计(PV 每次访问+1 / UV 首次访问+1;LeanCloud 全局同步 + localStorage 兜底) ======
   var uvEl = document.getElementById("siteUv");
   var pvEl = document.getElementById("sitePv");
 
-  // PV:本地计数器(每次页面加载 +1,刷新后累加)
+  // PV:本地先 +1 兜底展示,同时全局 +1 并覆盖为真实全局值
   var LOCAL_PV_KEY = "site-pv-local";
   if (pvEl) {
     var localPv = 0;
@@ -367,25 +395,23 @@
     localPv += 1;
     try { localStorage.setItem(LOCAL_PV_KEY, String(localPv)); } catch (e) {}
     pvEl.textContent = String(localPv);
-    // 后台尝试同步到 CountAPI
-    capiHit(NS, "site-pv").then(function (d) {
-      if (d && typeof d.value === "number") pvEl.textContent = String(d.value);
-    }).catch(function () {});
+    if (lcEnabled()) {
+      lcIncr("site-pv", 1).then(function (v) { pvEl.textContent = String(v); }).catch(function () {});
+    }
   }
 
-  // UV:基于 localStorage 的首次访问标记(本机固定为 1)
+  // UV:本机首次访问时全局 +1;老访客只读全局值。本机兜底显示至少 1
   if (uvEl) {
     var uvSeen = false;
     try { uvSeen = localStorage.getItem("site-uv-seen") === "1"; } catch (e) {}
-    uvEl.textContent = "1"; // 本机至少 1 个访客(你自己)
-    // 后台尝试从 CountAPI 获取真实全局 UV(仅当可达时替换显示)
-    capiGet(NS, "site-uv").then(function (d) {
-      if (d && typeof d.value === "number") uvEl.textContent = String(d.value);
-    }).catch(function () {});
-    if (!uvSeen) {
-      try { localStorage.setItem("site-uv-seen", "1"); } catch (e) {}
-      // 标记本机为新 UV,通知 CountAPI
-      capiHit(NS, "site-uv").catch(function () {});
+    uvEl.textContent = "1";
+    if (lcEnabled()) {
+      if (!uvSeen) {
+        lcIncr("site-uv", 1).then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
+        try { localStorage.setItem("site-uv-seen", "1"); } catch (e) {}
+      } else {
+        lcGet("site-uv").then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
+      }
     }
   }
 
