@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>document.documentElement.classList.add('js');</script>
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
   <title>柔性压力传感器的标定与噪声处理 | 花健 · Jian Hua</title>
-  <meta name="description" content="记录一次织物压力传感器标定的完整流程,以及如何处理实测中的噪声与漂移。" />
+  <meta name="description" content="从桥式电路到漂移补偿,记录一次织物压力传感器标定的完整流程与噪声处理方法。" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
@@ -25,28 +26,62 @@
       <h1 class="post-title">柔性压力传感器的标定与噪声处理</h1>
 
       <div class="prose">
-      <p>标定决定了一个传感器"说不说真话"。本文记录一次织物压力传感器标定的完整流程,以及如何处理实测中的噪声。</p>
+      <p>标定决定了一个传感器"说不说真话"。一块没标定的柔性压力片,读出来的数字既无单位也不可比。本文以<strong>压阻织物压力传感器</strong>为例,记录一次从桥式电路到漂移补偿的完整标定流程,并给出可直接用的噪声处理思路。</p>
 
-      <h2>1. 为什么标定</h2>
-      <p>柔性压阻材料非线性、有迟滞,同一压力两次读数可能不同。标定就是建立"电阻 / 电压 → 真实压力"的映射,否则原始数据没有物理意义。</p>
+      <h2>1. 为什么必须标定</h2>
+      <p>压阻材料批次差异大、迟滞明显,同一压力下不同样品读数能差一倍。标定就是建立<strong>物理量(压力)↔ 读数(电压/ADC)</strong>的映射,让数据可解释、可跨器件比较。</p>
 
-      <h2>2. 桥式电路</h2>
-      <p>单点电阻变化太小,常用半桥或全桥(惠斯通电桥)把微小变化转成差分电压,再放大。</p>
-      <div class="code-block"><code>V_out = V_ex * (R_x / (R_x + R_ref) - 0.5)  // 半桥近似</code></div>
+      <h2>2. 桥式电路与激励</h2>
+      <p>单个压阻元件直接分压,温漂和线阻会污染信号。更稳的做法是用<strong>半桥/全桥</strong>:把传感元件与参考电阻组成惠斯通电桥,输出差分电压,抵消共模漂移。</p>
+      <div class="code-block"><code>Vout = Vexc * (R_sensor - R_ref) / (R_sensor + R_ref)</code></div>
+      <p>用<strong>恒流源</strong>或稳定基准给桥供电,比直接接 VCC 更抗电源波动。</p>
 
       <h2>3. 标定流程</h2>
-      <p>逐档加载已知质量(如 0 / 50 / 100 / 200 / 500 g),记录稳定读数;用多项式或分段线性拟合压力–电压曲线。建议每个点静置 3 秒等蠕变稳定。</p>
+      <p>准备一组已知压力的标准砝码(或商用测力计),逐步加载并记录:</p>
+      <ul>
+        <li>从 0 开始,按 5/10/20/50/100 kPa 逐级加载,每级稳定 2–3 秒再读。</li>
+        <li>再逐级卸载,得到"加载—卸载"两条曲线,用以评估<strong>迟滞</strong>。</li>
+        <li>每组重复 3 次取平均,降低随机误差。</li>
+      </ul>
 
-      <h2>4. 噪声与漂移处理</h2>
-      <p>· <strong>硬件层</strong>:电源去耦、屏蔽线、工频(50 Hz)陷波。<br>· <strong>软件层</strong>:移动平均 / 低通滤波;对缓慢漂移做高通或周期性归零。<br>· <strong>漂移补偿</strong>:记录空载基线,实时减去。</p>
+      <h2>4. 拟合映射</h2>
+      <p>把"压力—读数"点画出来,低段近似线性,高段常饱和。两步拟合:</p>
+      <ul>
+        <li>先看 <strong>线性回归</strong>,看 R² 够不够;</li>
+        <li>不够就用<strong>多项式(2–3 次)</strong>或分段线性,弯曲处更准。</li>
+      </ul>
+      <p>下面用 Python 做一次二次多项式拟合:</p>
       <div class="code-block"><code>import numpy as np
-x = np.array(volts)
-y = np.array(grams)
-coef = np.polyfit(x, y, 2)            # 二次拟合
-pressure = np.polyval(coef, reading) - baseline</code></div>
+x = np.array([0, 5, 10, 20, 50, 100])   # 已知压力 kPa
+y = np.array([12, 130, 240, 460, 880, 1200])  # 对应 ADC 读数
+coef = np.polyfit(y, x, 2)             # 以读数为自变量,反推压力
+pressure = np.polyval(coef, raw_adc)   # 之后实时换算</code></div>
+
+      <h2>5. 噪声来自哪里</h2>
+      <ul>
+        <li><strong>热噪声/约翰逊噪声</strong>:电阻本身,可用平均抑制。</li>
+        <li><strong>接触噪声</strong>:织物与电极接触微动,表现为"沙沙"高频抖动。</li>
+        <li><strong>电磁干扰(EMI)</strong>:附近电机、开关电源串入 50/100 Hz 及其谐波。</li>
+        <li><strong>运动伪影</strong>:不是真噪声,但是最容易被误当成信号的假象。</li>
+      </ul>
+
+      <h2>6. 滤波策略</h2>
+      <ul>
+        <li><strong>移动平均 / 指数平滑</strong>:最简单,压高频抖动,但会拖慢响应。</li>
+        <li><strong>中值滤波</strong>:对偶发尖刺(接触火花)特别有效,保留阶跃。</li>
+        <li><strong>带阻( notch )</strong>:专门抠掉 50 Hz 工频干扰。</li>
+        <li><strong>卡尔曼(lite)</strong>:有模型时更优,但参数要调,新手先用前三种。</li>
+      </ul>
+
+      <h2>7. 漂移补偿</h2>
+      <p>温升/出汗让零点慢慢漂。两个实用办法:</p>
+      <ul>
+        <li><strong>上电归零</strong>:每次开机采一段静息值作基准减去。</li>
+        <li><strong>高通/去趋势</strong>:对慢漂做高通,保留快速压力变化(适合动作识别)。</li>
+      </ul>
 
       <h2>小结</h2>
-      <p>标定不是一次性工作。材料会老化、温湿度会变,量产时每片都要单独标定,或至少做温度补偿。标得好,后面的算法才好做。</p>
+      <p>标定的目标不是"曲线完美",而是让后续算法拿到<strong>有单位、可比较、低漂移</strong>的信号。把桥路、标定表、滤波三件事做对,柔性传感的数据质量会立刻上一个台阶。</p>
       </div>
     </article>
   </main>
@@ -58,11 +93,8 @@ pressure = np.polyval(coef, reading) - baseline</code></div>
   </footer>
   <script src="../js/main.js"></script>
   <script>
-    // 兜底:主脚本未成功初始化时,直接显示渐显元素,避免空白
     window.addEventListener('load', function () {
-      if (!window.__siteReady) {
-        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
-      }
+      document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
     });
   </script>
   <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>

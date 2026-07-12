@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>document.documentElement.classList.add('js');</script>
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
   <title>可穿戴系统入门:从柔性传感器到数据可视化 | 花健 · Jian Hua</title>
-  <meta name="description" content="梳理可穿戴系统的最小可行链路:采集—传输—可视化,以及常见坑。" />
+  <meta name="description" content="梳理一条可穿戴系统的最小可行链路:采集—传输—可视化,以及选型与常见坑。" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
@@ -25,28 +26,57 @@
       <h1 class="post-title">可穿戴系统入门:从柔性传感器到数据可视化</h1>
 
       <div class="prose">
-      <p>可穿戴系统的本质,是把人体信号变成可读的数据。本文梳理一条"最小可行链路":采集 → 传输 → 可视化,作为上手的第一块拼图。</p>
+      <p>可穿戴系统的本质,是把<strong>人体信号</strong>变成<strong>可读的数据</strong>。听起来高深,但拆开看,它几乎总是一条相同的链路:<strong>感知 → 调理/采集 → 传输 → 可视化</strong>。本文用这条链路串起选型思路与常见坑,给第一次搭系统的你一个地图。</p>
 
-      <h2>1. 柔性传感器:系统的眼睛</h2>
-      <p>常见的柔性传感器包括:电阻式压力传感(织物压阻)、电容式接近传感,以及基于导电纱线的应变传感。它们能贴合皮肤弯曲,测量压力、拉伸、弯折等物理量。</p>
+      <h2>1. 一条最小可行链路</h2>
+      <p>不论做的是心率衣、姿态裤还是手势手套,都可以画成同一张图:</p>
+      <div class="code-block"><code>柔性传感器 → 信号调理 → MCU(ADC) → 无线(BLE) → 手机/网页 → 图表</code></div>
+      <p>每一环都有现成模块,真正难的不是"让灯亮",而是让数据<strong>稳定、可解释</strong>。下面逐环说。</p>
 
-      <h2>2. 信号链</h2>
-      <p>传感器 → 信号调理(放大 / 滤波)→ ADC(模数转换)→ MCU(如 ESP32)→ 无线(蓝牙 / Wi-Fi)→ 手机或电脑。柔性传感信号很弱,前端放大与工频滤波是关键。</p>
+      <h2>2. 柔性传感器选型</h2>
+      <p>常见的柔性传感机制有三种,各有侧重:</p>
+      <ul>
+        <li><strong>电阻/压阻式</strong>(如导电织物、Velostat):受压电阻变化,便宜、易缝进布料,但迟滞和非线性明显。</li>
+        <li><strong>电容式</strong>:对接近/形变敏感,功耗低、动态好,但易受湿度与电磁干扰。</li>
+        <li><strong>应变片/液态金属</strong>:量程与精度更好,工艺门槛高一些。</li>
+      </ul>
+      <p>经验法则:先做<strong>原型验证</strong>选压阻织物,追求精度再上电容或应变方案。</p>
 
-      <h2>3. 传输与可视化</h2>
-      <p>MCU 通过 BLE 把数据推到手机。可视化可以用 Web Bluetooth + Chart.js 在网页实时画曲线,也可以用 Python(Matplotlib / Plotly)做离线分析。</p>
-      <div class="code-block"><code>// 浏览器侧:Web Bluetooth 读取特征值并绘图
-const device = await navigator.bluetooth.requestDevice({
-  filters: [{ services: ['wearable'] }]
-});
-const server = await device.gatt.connect();
-// ... 订阅特征值 → 推入 Chart.js 数据数组实时刷新</code></div>
+      <h2>3. 信号调理与采集</h2>
+      <p>传感器出来的信号往往很弱、很脏。调理电路做三件事:</p>
+      <ul>
+        <li><strong>放大</strong>:用仪表放大器(INA)把 mV 级信号抬到 ADC 友好区间。</li>
+        <li><strong>滤波</strong>:硬件 RC 低通先挡掉高频噪声,软件再做平滑。</li>
+        <li><strong>偏置</strong>:把双极性信号搬到 ADC 的 0–Vref 范围内。</li>
+      </ul>
+      <p>MCU 侧用 <strong>ADC</strong> 采样,注意采样率与分辨率够用即可——动作信号几十 Hz 就够,不必盲目追高。</p>
 
-      <h2>常见坑</h2>
-      <p>· <strong>运动伪影</strong>:传感器随衣物滑动产生假信号,固定方式与基线校准很重要。<br>· <strong>功耗</strong>:无线传输是耗电大户,采样率与广播间隔要权衡。<br>· <strong>漂移</strong>:柔性材料蠕变,长时间需定期归零。</p>
+      <h2>4. 无线传输</h2>
+      <p> wearable 多半用 <strong>BLE(Bluetooth Low Energy)</strong>:手机直连、功耗低。把采样值打包成特征值(Characteristic)周期广播,网页端可用 <code>Web Bluetooth</code> 直接收(注意仅 HTTPS/localhost 可用)。</p>
+      <div class="code-block"><code>// 伪代码:每 50ms 发一帧
+setInterval(() =&gt; {
+  const frame = readSensors();      // 读 ADC
+  characteristic.writeValue(frame); // BLE 发出
+}, 50);</code></div>
+
+      <h2>5. 数据可视化</h2>
+      <p>数据到手机/网页后,先画出来才有意义。最小方案:</p>
+      <ul>
+        <li><strong>串口绘图</strong>:开发阶段用串口监视器看波形,最快定位问题。</li>
+        <li><strong>网页图表</strong>:用轻量库(如 Chart.js)做滚动折线,实时显示各通道。</li>
+        <li><strong>标注事件</strong>:让用户点"开始动作"打标,后面做动作识别才有标签。</li>
+      </ul>
+
+      <h2>6. 常见坑</h2>
+      <ul>
+        <li><strong>运动伪影</strong>:衣服滑动、电缆拽动都会伪造信号。固定走线、贴紧皮肤能缓解。</li>
+        <li><strong>基线漂移</strong>:温度/出汗让零点慢慢漂。要做<strong>归零/高通</strong>。</li>
+        <li><strong>供电噪声</strong>:电机、开关电源会串进模拟端。模拟/数字分开供电、加磁珠。</li>
+        <li><strong>蓝牙丢包</strong>:别把帧发太大太密,留出余量。</li>
+      </ul>
 
       <h2>小结</h2>
-      <p>先把这条链路跑通一个传感器、一个通道,再谈多模态融合。可穿戴系统的难点从来不在"能测",而在"测得稳、读得懂"。下一篇会深入传感器标定这一步。</p>
+      <p>把系统想成一条链路,每环都可独立替换与标定,问题就好定位了。其中<strong>传感器标定与噪声处理</strong>往往最耗时,下一篇就以柔性压力传感器为例,拆一遍完整流程——见 <a href="post-3.html">《柔性压力传感器的标定与噪声处理》</a>。</p>
       </div>
     </article>
   </main>
@@ -58,11 +88,8 @@ const server = await device.gatt.connect();
   </footer>
   <script src="../js/main.js"></script>
   <script>
-    // 兜底:主脚本未成功初始化时,直接显示渐显元素,避免空白
     window.addEventListener('load', function () {
-      if (!window.__siteReady) {
-        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
-      }
+      document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
     });
   </script>
   <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>

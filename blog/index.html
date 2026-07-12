@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>document.documentElement.classList.add('js');</script>
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
   <title>全部笔记 | 花健 · Jian Hua</title>
   <meta name="description" content="花健的研究随笔、教程与读书记录索引页。" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
@@ -25,7 +26,7 @@
       <div class="blog-grid">
         <a class="blog-card reveal" href="post-1.html">
           <div class="blog-thumb blog-thumb-1" aria-hidden="true"></div>
-          <div class="blog-meta">2026.07 · 数字时尚</div>
+          <div class="blog-meta">2026.07 · 服装数字化</div>
           <h3 class="blog-title">用 Three.js 做一个可旋转的 3D 虚拟服装展示</h3>
           <p class="blog-excerpt">从 GLTF 模型加载到 orbit 控制器,几行代码就能在网页里转起一件衣服。</p>
           <span class="blog-more">阅读更多 →</span>
@@ -69,11 +70,9 @@
   </footer>
   <script src="../js/main.js"></script>
   <script>
-    // 兜底:主脚本未成功初始化时,直接显示渐显元素,避免空白
+    // Fallback (unconditional): reveal all .reveal elements on load so the page is never blank.
     window.addEventListener('load', function () {
-      if (!window.__siteReady) {
-        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
-      }
+      document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
     });
   </script>
   <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>

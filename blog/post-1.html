@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>document.documentElement.classList.add('js');</script>
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
   <title>用 Three.js 做一个可旋转的 3D 虚拟服装展示 | 花健 · Jian Hua</title>
-  <meta name="description" content="用 Three.js 搭建可旋转、可缩放的 3D 虚拟服装展示的最小可运行示例。" />
+  <meta name="description" content="用 Three.js 搭建可旋转、可缩放的 3D 虚拟服装展示的最小可运行示例,并延伸到产品级展示。" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
@@ -21,29 +22,39 @@
   <main class="container" style="padding-top:96px;padding-bottom:64px;">
     <article class="post prose" style="margin:0 auto;">
       <a class="post-back" href="../">← 返回主页 / Back to home</a>
-      <p class="post-meta">2026.07 · 数字时尚 · Digital Fashion</p>
+      <p class="post-meta">2026.07 · 服装数字化 · Digital Fashion</p>
       <h1 class="post-title">用 Three.js 做一个可旋转的 3D 虚拟服装展示</h1>
 
       <div class="prose">
-      <p>把一件衣服放进网页,让用户用鼠标自由旋转、缩放查看,是数字时尚最直观的展示方式之一。本文用 Three.js 搭一个最小可运行示例,不依赖任何打包工具,直接用 ES Module 即可。</p>
+      <p>把一件衣服放进网页,让用户用鼠标自由旋转、缩放查看,是数字时尚最直观的展示方式之一。本文用 Three.js 搭一个<strong>最小可运行示例</strong>,不依赖任何打包工具,直接用 ES Module 即可跑起来;最后再聊怎么把它做成产品级的虚拟试穿入口。</p>
 
-      <h2>1. 准备模型</h2>
-      <p>先用 Blender 或 CLO 3D 导出 <code>.glb</code>(GLTF 的二进制版,体积小、无需额外贴图文件)。把它放到项目的 <code>models/</code> 目录。</p>
+      <h2>1. 为什么要在网页里展示 3D 服装</h2>
+      <p>相比一张渲染图,可交互的 3D 模型能传达褶皱走向、版型体积和面料垂感——这些是平面图很难表达的。而对研究者来说,网页还意味着<strong>零安装、跨平台、易分享</strong>:把链接发给合作者,对方点开就能转。它也是连接"建模"和"展示/评测"的自然桥梁。</p>
 
-      <h2>2. 场景、相机、渲染器</h2>
+      <h2>2. 准备模型</h2>
+      <p>先用 Blender 或 CLO 3D 导出 <code>.glb</code>(GLTF 的二进制版,体积小、无需额外贴图文件)。放到项目的 <code>models/</code> 目录前,注意几点:</p>
+      <ul>
+        <li><strong>单位与轴向</strong>:统一用米,且让"上"为 +Y;很多服装软件导出时轴向不一致,会在网页里"躺平"。</li>
+        <li><strong>面数预算</strong>:网页端建议单件衣服控制在 2–5 万面以内;过高会拖慢中低端手机。</li>
+        <li><strong>原点</strong>:把模型原点放在衣服几何中心附近,后续相机"框住"物体会简单很多。</li>
+      </ul>
+
+      <h2>3. 场景、相机、渲染器(最小骨架)</h2>
       <p>Three.js 的三件套:场景(Scene)、相机(PerspectiveCamera)、渲染器(WebGLRenderer)。把它们挂到一个容器 div 上,并让相机看向原点。</p>
       <div class="code-block"><code>import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
+const stage = document.getElementById('stage');
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
 camera.position.set(0, 1, 3);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 renderer.setSize(480, 480);
-document.getElementById('stage').appendChild(renderer.domElement);</code></div>
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+stage.appendChild(renderer.domElement);</code></div>
 
-      <h2>3. 加载模型 + 轨道控制器</h2>
+      <h2>4. 加载模型 + 轨道控制器</h2>
       <p><code>GLTFLoader</code> 读入模型,<code>OrbitControls</code> 负责"拖拽旋转、滚轮缩放"。加载完成后把模型加入场景,并用一个辅助函数让相机自动框住物体。</p>
       <div class="code-block"><code>const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -59,12 +70,38 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();</code></div>
+      <p>其中 <code>fitCameraToObject</code> 用包围盒(BoundingBox)算出一个合适距离,避免"衣服太大撑出屏幕"或"太小看不见"。网上有成熟写法,直接复用即可。</p>
 
-      <h2>4. 打光与环境</h2>
-      <p>服装材质对光很敏感。用 <code>HemisphereLight</code> 做环境光,加一盏 <code>DirectionalLight</code> 勾出褶皱阴影;若用 <code>MeshStandardMaterial</code>,建议再叠加一个基于图像的照明(IBL,如 RoomEnvironment),布料质感会真实很多。</p>
+      <h2>5. 打光与环境</h2>
+      <p>服装材质对光很敏感。用 <code>HemisphereLight</code> 做环境光,加一盏 <code>DirectionalLight</code> 勾出褶皱阴影;若用 <code>MeshStandardMaterial</code>,建议再叠加基于图像的照明(IBL,如 <code>RoomEnvironment</code>),布料质感会真实很多。</p>
+      <div class="code-block"><code>scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.1));
+const key = new THREE.DirectionalLight(0xffffff, 1.6);
+key.position.set(2, 4, 3);
+scene.add(key);
+
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;</code></div>
+
+      <h2>6. 让展示更"产品级"</h2>
+      <p>到这里已经能转能看了。再往前走几步,就能做成可用的展示位:</p>
+      <ul>
+        <li><strong>自动旋转</strong>:<code>controls.autoRotate = true</code>,无人操作时缓慢自转,有人交互时停下。</li>
+        <li><strong>换色</strong>:遍历材质改 <code>.color</code>,或预设几套配色让用户点选。</li>
+        <li><strong>布料/版型切换</strong>:预载多个 glb,切换时淡入淡出,做成"虚拟试穿"雏形。</li>
+        <li><strong>移动端手势</strong>:OrbitControls 默认支持单指旋转、双指缩放,基本开箱即用。</li>
+      </ul>
+
+      <h2>7. 体积与性能</h2>
+      <p>模型大了加载慢。几个立竿见影的优化:</p>
+      <ul>
+        <li>导出时开启 <strong>Draco 几何压缩</strong> 与 <strong>KTX2 纹理压缩</strong>,体积常能降 70%+。</li>
+        <li>用 <code>GLTFLoader</code> 的 <code>setDRACOLoader</code> / <code>setKTX2Loader</code> 配套解码。</li>
+        <li>多件衣服共用同一材质时,用<strong>实例化</strong>减少 draw call。</li>
+      </ul>
 
       <h2>小结</h2>
-      <p>至此,一个可旋转、可缩放的 3D 服装展示就完成了。后续可以加自动旋转、换色、甚至布料物理模拟,把它做成产品级的虚拟试穿入口。下一篇会讲如何把模型批量、标准化地导出来喂给这里。</p>
+      <p>至此,一个可旋转、可缩放、带真实打光的 3D 服装展示就完成了。它的输入是一个 <code>.glb</code> 文件,而"如何把一堆衣服批量、标准化地导出来喂给这里"正是下一篇要讲的内容——见 <a href="post-4.html">《用 Blender 批量导出服装数字资产》</a>。</p>
       </div>
     </article>
   </main>
@@ -76,11 +113,9 @@ animate();</code></div>
   </footer>
   <script src="../js/main.js"></script>
   <script>
-    // 兜底:主脚本未成功初始化时,直接显示渐显元素,避免空白
+    // Fallback (unconditional): reveal all .reveal elements on load so the page is never blank.
     window.addEventListener('load', function () {
-      if (!window.__siteReady) {
-        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
-      }
+      document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
     });
   </script>
   <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>

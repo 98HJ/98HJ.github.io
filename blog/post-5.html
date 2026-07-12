@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script>document.documentElement.classList.add('js');</script>
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
   <title>读论文的卡片笔记法 | 花健 · Jian Hua</title>
-  <meta name="description" content="用 Zettelkasten 卡片笔记法把读论文从消费变成积累。" />
+  <meta name="description" content="用原子化、可链接的卡片笔记串起研究方向,把"读完就忘"变成可复用的知识网络。" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
@@ -21,26 +22,44 @@
   <main class="container" style="padding-top:96px;padding-bottom:64px;">
     <article class="post prose" style="margin:0 auto;">
       <a class="post-back" href="../">← 返回主页 / Back to home</a>
-      <p class="post-meta">2026.03 · 研究方法 · Research Methods</p>
+      <p class="post-meta">2026.03 · 研究方法 · Research Method</p>
       <h1 class="post-title">读论文的卡片笔记法</h1>
 
       <div class="prose">
-      <p>文献越读越多,却总记不住、串不起来。Zettelkasten(卡片盒)方法用一个简单原则破局:原子化 + 链接。</p>
+      <p>文献越读越多,却总记不住、串不起来——这是大多数研究者的常态。本文分享我用的<strong>卡片笔记法(Zettelkasten 思路)</strong>:把每篇论文拆成一张张<strong>原子化、可链接</strong>的卡片,让知识自己长成网络,而不是堆在文件夹里吃灰。</p>
 
-      <h2>1. 什么是卡片笔记</h2>
-      <p>每读一篇论文,写若干张"原子笔记"——每张只记一个想法、方法或结论,用自己的话。卡片之间用双向链接连成网络,而不是按文件夹归档。</p>
+      <h2>1. 为什么记不住</h2>
+      <p>传统"一篇一笔记"的问题:笔记以<strong>文献</strong>为单位,而思考以<strong>问题</strong>为单位。等你真要写综述或立题,得翻回十几篇长笔记找那一句话,成本太高,于是干脆重写——知识没有复用。</p>
 
-      <h2>2. 三类笔记</h2>
-      <p>· <strong>文献笔记</strong>:读时摘录原文要点;<br>· <strong>永久笔记</strong>:消化后写成的原子想法;<br>· <strong>索引笔记</strong>:把相关永久笔记串成主题线索。</p>
+      <h2>2. 核心思想:原子化</h2>
+      <p>每张卡片只装<strong>一个想法</strong>:一个方法、一个结论、一个反例。原子化让一张卡能被多处引用,也更容易在写作时像乐高一样拼装。</p>
 
-      <h2>3. 在数字时尚研究中的实践</h2>
-      <p>我用一个本地 Markdown + 双向链接工具(如 Obsidian)管理。例如"柔性传感信号链"这张卡,会链到"标定与噪声"、"可穿戴可视化",再链到具体论文卡。写综述时,顺着链接就能把脉络拉出来。</p>
+      <h2>3. 链接,而非分类</h2>
+      <p>别急着建"文件夹树"。卡片之间用<strong>双向链接</strong>互相指向:"这张方法的局限 → 见那张替代方案"。知识因此按<strong>语义</strong>长成网,而不是被硬塞进层级。当你发现三张卡都链到同一个问题,一个新研究方向就浮现了。</p>
 
-      <h2>4. 关键习惯</h2>
-      <p>· 永远用自己的话写,不抄原句;<br>· 每张卡可独立理解;<br>· 写新卡时先找它能连到哪张旧卡。</p>
+      <h2>4. 我的卡片模板</h2>
+      <p>每张文献卡固定四格,5 分钟填完:</p>
+      <ul>
+        <li><strong>问题</strong>:它要解决什么?</li>
+        <li><strong>方法</strong>:核心做法一句话。</li>
+        <li><strong>证据</strong>:关键结果/数据,附图号。</li>
+        <li><strong>疑问</strong>:哪里存疑、我能怎么接着做。</li>
+      </ul>
+      <p>"疑问"格最重要——它把被动阅读变成<strong>主动接口</strong>,后续工作和文献直接挂钩。</p>
+
+      <h2>5. 工具选择</h2>
+      <ul>
+        <li><strong>纯文本 / Markdown</strong>:最稳,永不锁定,秒搜。</li>
+        <li><strong>双向链接工具</strong>(如 Obsidian):可视化网络图,适合发散找关联。</li>
+        <li><strong>代码式</strong>:用 git 管笔记,版本可追溯,顺手还能生成站点。</li>
+      </ul>
+      <p>工具不重要,<strong>原子化 + 链接</strong>的习惯才重要。</p>
+
+      <h2>6. 与写作的正向循环</h2>
+      <p>写论文时,直接按论点把相关卡片拉出来排顺序,每句都有出处。立题时,看哪些"疑问"被多张卡反复指向,那就是值得做的空白。笔记从"存档"变成了<strong>研究本身的工作台</strong>。</p>
 
       <h2>小结</h2>
-      <p>卡片笔记不是"收藏",而是"思考的外置"。它把读论文从消费变成积累,久了会形成你自己的研究地图。</p>
+      <p>卡片笔记法不神奇,它只是把"读"和"用"之间的断层填平:每张卡都是一个可复用的知识单元,链接让它生长。坚持一个月,你会明显感觉文献"长"在了自己脑子里,而不是躺在硬盘里。</p>
       </div>
     </article>
   </main>
@@ -52,11 +71,8 @@
   </footer>
   <script src="../js/main.js"></script>
   <script>
-    // 兜底:主脚本未成功初始化时,直接显示渐显元素,避免空白
     window.addEventListener('load', function () {
-      if (!window.__siteReady) {
-        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
-      }
+      document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
     });
   </script>
   <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>
