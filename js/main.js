@@ -285,16 +285,25 @@
   var likeBtn = document.getElementById("likeBtn");
   var likeCount = document.getElementById("likeCount");
   if (likeBtn) {
-    var LIKE_KEY = "site-liked";
+    var LIKE_KEY = "site-liked";       // 本浏览器是否已赞(防重复/支持取消)
+    var LIKES_CACHE = "site-likes-cache"; // 上次成功拉到的全局基数(离线也能显示)
     var liked = false;
     try { liked = localStorage.getItem(LIKE_KEY) === "1"; } catch (e) {}
+    // 基数:优先用本地缓存(避免一直显示 0),联网后会被真实全局值覆盖
+    var base = 0;
+    try { var cb = parseInt(localStorage.getItem(LIKES_CACHE), 10); if (!isNaN(cb)) base = cb; } catch (e) {}
+    function renderLikes(v) { if (likeCount) likeCount.textContent = String(v); }
+    function persistBase() { try { localStorage.setItem(LIKES_CACHE, String(base)); } catch (e) {} }
     likeBtn.classList.toggle("liked", liked);
     likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
-    // 先展示当前全局总数
+    renderLikes(base); // 立即显示(缓存或 0),不空白
+
+    // 后台拉取真实全局值:在线则对齐,离线保持本地缓存
     capiGet(NS, "likes").then(function (d) {
-      if (d && typeof d.value === "number" && likeCount) likeCount.textContent = String(d.value);
+      if (d && typeof d.value === "number") { base = d.value; persistBase(); renderLikes(base); }
     }).catch(function () {});
-    // 取消点赞失败时回滚本地状态,保持与全局计数一致
+
+    // 取消点赞写入全局失败时,回滚本地状态保持与全局一致
     function revertLike() {
       liked = true;
       try { localStorage.setItem(LIKE_KEY, "1"); } catch (e) {}
@@ -306,30 +315,28 @@
       try { localStorage.setItem(LIKE_KEY, liked ? "1" : "0"); } catch (e) {}
       likeBtn.classList.toggle("liked", liked);
       likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
-      // 触觉反馈(点赞/取消都给一次回弹)
-      likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
+      likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop"); // 回弹反馈
 
       if (liked) {
-        // 点赞:全局 +1 + 动画 + 全屏庆祝
+        // 乐观更新:本地先 +1(无论是否联网,点击必有反馈),联网后再对齐真实全局值
+        base += 1; renderLikes(base);
         spawnParticles(likeBtn);
         celebrateLike(likeBtn);
         capiHit(NS, "likes").then(function (d) {
-          if (d && typeof d.value === "number" && likeCount) likeCount.textContent = String(d.value);
+          if (d && typeof d.value === "number") { base = d.value; persistBase(); renderLikes(base); }
         }).catch(function () {});
       } else {
-        // 取消点赞:读当前全局值再 -1 写回(CountAPI 免令牌 /update,GET 无 CORS 预检)
+        // 乐观更新:本地先 -1
+        base = Math.max(0, base - 1); renderLikes(base);
+        // 后台把全局值 -1(读当前值再写回 v-1;CountAPI 免令牌 /update,GET 无 CORS 预检)
         capiGet(NS, "likes").then(function (d) {
           var v = (d && typeof d.value === "number") ? d.value : 0;
-          if (v <= 0) { if (likeCount) likeCount.textContent = "0"; return; }
+          if (v <= 0) return;
           return capiUpdate(NS, "likes", v - 1);
         }).then(function (d) {
-          if (d && typeof d.value === "number" && likeCount) {
-            likeCount.textContent = String(d.value);
-          } else if (d === undefined) {
-            // v<=0 分支,无需处理
-          } else {
-            revertLike(); // 更新未返回有效值 -> 回滚
-          }
+          if (d && typeof d.value === "number") { base = d.value; persistBase(); renderLikes(base); }
+          else if (d === undefined) { /* v<=0 分支,无需处理 */ }
+          else { revertLike(); } // 更新未返回有效值 -> 回滚
         }).catch(function () { revertLike(); });
       }
     });
