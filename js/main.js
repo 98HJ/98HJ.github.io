@@ -183,14 +183,15 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- 全局统计(腾讯云 SCF + COS · 国内可达 · 免费) ---------- */
+  /* ---------- 全局统计(Cloudflare Workers + KV · 免实名 · 永久免费) ---------- */
   /*
-   * 真值源:腾讯云函数 SCF(读写 COS 计数文件),跨所有访客共享;兜底:localStorage。
-   * 用户在腾讯云建 SCF(Python) + COS 桶 + API 网关后,把 API 网关 base URL 填到 COUNTER_API。
+   * 真值源:Cloudflare Worker(读写 KV 命名空间),跨所有访客共享点赞/PV/UV;兜底:localStorage。
+   * 用户在 Cloudflare 建 Worker + KV 后,把 Worker 的 URL 填到 COUNTER_API(形如 https://<名>.<子域>.workers.dev)。
    * 接口约定: GET/POST {COUNTER_API}/counter?key=KEY[&delta=N] 返回 {"value":数字}
    * 未填写或不可达时,自动降级为 localStorage 本地模式(刷新不丢,但不跨设备共享)。
+   * 国内访问 Cloudflare 偶发被限速,但免费且免实名;绑定自定义域名可进一步提速。
    */
-  var COUNTER_API = "____FILL_COUNTER_API____"; // ← 替换为你的 API 网关 base URL
+  var COUNTER_API = "____FILL_COUNTER_API____"; // ← 替换为你的 Cloudflare Worker URL(作为 /counter 接口的 base)
   var COUNTER_READY = COUNTER_API.indexOf("____") !== 0 && COUNTER_API.length > 8;
 
   function counterHeaders() { return { "Content-Type": "application/json" }; }
@@ -295,7 +296,7 @@
     })(thanks);
   }
 
-  // ====== 点赞(本地 localStorage 持久化,刷新不丢;CountAPI 可选全局同步) ======
+  // ====== 点赞(本地 localStorage 持久化,刷新不丢;Cloudflare 可选全局同步) ======
   var likeBtn = document.getElementById("likeBtn");
   var likeCount = document.getElementById("likeCount");
   if (likeBtn) {
@@ -354,7 +355,7 @@
     });
   }
 
-  // ====== 访客统计(PV 每次访问+1 / UV 首次访问+1;腾讯云全局同步 + localStorage 兜底) ======
+  // ====== 访客统计(PV 每次访问+1 / UV 首次访问+1;Cloudflare 全局同步 + localStorage 兜底) ======
   var uvEl = document.getElementById("siteUv");
   var pvEl = document.getElementById("sitePv");
 
