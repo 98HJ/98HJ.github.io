@@ -132,57 +132,24 @@
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* ---------- 3D 头像交互:指针倾斜(通过 CSS 变量驱动) + 拖拽旋转 + 空闲摆动 ---------- */
+  /* ---------- 3D 头像交互:悬停跟随光标倾斜(视差) ---------- */
   var heroPhoto = document.querySelector(".hero-photo");
   var stage = document.querySelector(".photo-3d");
   var reduce3d = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var canHover = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  if (heroPhoto && stage && !reduce3d) {
-    var MAX_TILT = 14;
-    function setTilt(rx, ry) {
-      stage.style.setProperty("--rx", rx + "deg");
-      stage.style.setProperty("--ry", ry + "deg");
-    }
-
-    if (canHover) {
-      /* 悬停:跟随指针轻微倾斜(视差) */
-      heroPhoto.addEventListener("pointermove", function (e) {
-        if (dragging) return;
-        var r = heroPhoto.getBoundingClientRect();
-        var px = (e.clientX - r.left) / r.width - 0.5;
-        var py = (e.clientY - r.top) / r.height - 0.5;
-        setTilt((-py * MAX_TILT).toFixed(2), (px * MAX_TILT).toFixed(2));
-      });
-      heroPhoto.addEventListener("pointerleave", function () {
-        if (dragging) return;
-        setTilt(0, 0);
-      });
-
-      /* 拖拽:手动旋转头像(Y/X 轴),松开后回弹到空闲摆动 */
-      var dragging = false, lastX = 0, lastY = 0, baseRY = 0, baseRX = 0;
-      heroPhoto.addEventListener("pointerdown", function (e) {
-        dragging = true; lastX = e.clientX; lastY = e.clientY;
-        heroPhoto.classList.add("is-dragging");
-        try { heroPhoto.setPointerCapture(e.pointerId); } catch (_) {}
-      });
-      heroPhoto.addEventListener("pointermove", function (e) {
-        if (!dragging) return;
-        var dx = e.clientX - lastX, dy = e.clientY - lastY;
-        lastX = e.clientX; lastY = e.clientY;
-        baseRY = Math.max(-42, Math.min(42, baseRY + dx * 0.6));
-        baseRX = Math.max(-22, Math.min(22, baseRX - dy * 0.4));
-        setTilt(baseRX.toFixed(2), baseRY.toFixed(2));
-      });
-      function endDrag(e) {
-        if (!dragging) return;
-        dragging = false; baseRY = 0; baseRX = 0;
-        heroPhoto.classList.remove("is-dragging");
-        setTilt(0, 0); /* 释放后交还给空闲摆动动画 */
-        try { heroPhoto.releasePointerCapture(e.pointerId); } catch (_) {}
-      }
-      heroPhoto.addEventListener("pointerup", endDrag);
-      heroPhoto.addEventListener("pointercancel", endDrag);
-    }
+  var fine3d = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  if (heroPhoto && stage && !reduce3d && fine3d) {
+    var MAX_TILT = 16;
+    heroPhoto.addEventListener("pointermove", function (e) {
+      var r = heroPhoto.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      stage.style.setProperty("--rx", (-py * MAX_TILT).toFixed(2) + "deg");
+      stage.style.setProperty("--ry", (px * MAX_TILT).toFixed(2) + "deg");
+    });
+    heroPhoto.addEventListener("pointerleave", function () {
+      stage.style.setProperty("--rx", "0deg");
+      stage.style.setProperty("--ry", "0deg");
+    });
   }
 
   /* ---------- 卡片 3D 微倾斜:研究卡片 / 笔记卡片 ---------- */
@@ -194,6 +161,7 @@
     var els = document.querySelectorAll(selector);
     Array.prototype.forEach.call(els, function (el) {
       el.style.transformStyle = "preserve-3d";
+      el.addEventListener("pointerenter", function () { el.classList.add("tilt-on"); });
       el.addEventListener("pointermove", function (e) {
         var r = el.getBoundingClientRect();
         var px = (e.clientX - r.left) / r.width - 0.5;
@@ -201,6 +169,7 @@
         el.style.transform = "perspective(760px) rotateY(" + (px * maxDeg).toFixed(2) + "deg) rotateX(" + (-py * maxDeg).toFixed(2) + "deg)";
       });
       el.addEventListener("pointerleave", function () {
+        el.classList.remove("tilt-on");
         el.style.transform = "";
       });
     });
