@@ -110,18 +110,36 @@
           </p>
           <div class="tag-row reveal">
             <span class="chip"><span class="lang-zh">服装数字化</span><span class="lang-en">Digital Fashion</span></span>
-            <span class="chip"><span class="lang-zh">智能穿戴</span><span class="lang-en">Wearable Systems</span></span>
+            <span class="chip"><span class="lang-zh">智能可穿戴</span><span class="lang-en">Wearable Systems</span></span>
             <span class="chip"><span class="lang-zh">柔性电子</span><span class="lang-en">Flexible Electronics</span></span>
           </div>
           <div class="hero-actions">
             <a class="btn btn-primary" href="#research"><span class="lang-zh">查看研究</span><span class="lang-en">View Research</span></a>
             <a class="btn btn-ghost" href="#notes"><span class="lang-zh">读读笔记</span><span class="lang-en">Read Notes</span></a>
           </div>
-          <div class="hero-orbit reveal" aria-label="研究方向">
-            <span class="orbit-core"><span class="lang-zh">研究方向</span><span class="lang-en">Focus</span></span>
-            <div class="orbit-spin orbit-1"><a class="orbit-item" href="#card-1" data-target="card-1"><span class="lang-zh">服装数字化</span><span class="lang-en">Digital Fashion</span></a></div>
-            <div class="orbit-spin orbit-2"><a class="orbit-item" href="#card-2" data-target="card-2"><span class="lang-zh">可穿戴系统</span><span class="lang-en">Wearable Systems</span></a></div>
-            <div class="orbit-spin orbit-3"><a class="orbit-item" href="#card-3" data-target="card-3"><span class="lang-zh">柔性电子</span><span class="lang-en">Flexible Electronics</span></a></div>
+          <div class="hero-radar reveal" aria-label="研究兴趣雷达图">
+            <svg class="radar-svg" viewBox="0 0 200 200" role="img" aria-label="Research interest radar">
+              <polygon class="radar-grid" points="100,20 176.1,75.3 147,164.7 53,164.7 23.9,75.3"/>
+              <polygon class="radar-grid" points="100,40 157.1,81.5 135.3,148.5 64.7,148.5 42.9,81.5"/>
+              <polygon class="radar-grid" points="100,60 138,87.6 123.5,132.4 76.5,132.4 62,87.6"/>
+              <polygon class="radar-grid" points="100,80 119,93.8 111.8,116.2 88.2,116.2 81,93.8"/>
+              <line class="radar-spoke" data-axis="0" x1="100" y1="100" x2="100" y2="20"/>
+              <line class="radar-spoke" data-axis="1" x1="100" y1="100" x2="176.1" y2="75.3"/>
+              <line class="radar-spoke" data-axis="2" x1="100" y1="100" x2="147" y2="164.7"/>
+              <line class="radar-spoke" data-axis="3" x1="100" y1="100" x2="53" y2="164.7"/>
+              <line class="radar-spoke" data-axis="4" x1="100" y1="100" x2="23.9" y2="75.3"/>
+              <polygon class="radar-area" points="100,28 164.7,79 137.6,151.8 69.4,142.1 57.1,86.4"/>
+              <circle class="radar-dot" data-axis="0" cx="100" cy="28" r="3.6"/>
+              <circle class="radar-dot" data-axis="1" cx="164.7" cy="79" r="3.6"/>
+              <circle class="radar-dot" data-axis="2" cx="137.6" cy="151.8" r="3.6"/>
+              <circle class="radar-dot" data-axis="3" cx="69.4" cy="142.1" r="3.6"/>
+              <circle class="radar-dot" data-axis="4" cx="57.1" cy="86.4" r="3.6"/>
+            </svg>
+            <button type="button" class="radar-label" style="left:50%;top:10.4%" data-axis="0" data-target="card-1"><span class="lang-zh">服装数字化</span><span class="lang-en">Digital Fashion</span></button>
+            <button type="button" class="radar-label" style="left:82.3%;top:37.8%" data-axis="1" data-target="card-2"><span class="lang-zh">可穿戴系统</span><span class="lang-en">Wearable</span></button>
+            <button type="button" class="radar-label" style="left:70%;top:82%" data-axis="2" data-target="card-3"><span class="lang-zh">柔性电子</span><span class="lang-en">Flexible Elec.</span></button>
+            <button type="button" class="radar-label" style="left:30%;top:82%" data-axis="3" data-target="research"><span class="lang-zh">智能织物</span><span class="lang-en">Smart Textiles</span></button>
+            <button type="button" class="radar-label" style="left:17.8%;top:37.8%" data-axis="4" data-target="research"><span class="lang-zh">人机交互</span><span class="lang-en">HCI</span></button>
           </div>
         </div>
         <div class="hero-photo reveal">

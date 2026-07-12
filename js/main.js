@@ -183,15 +183,27 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- Hero 研究轨道:点击定位到对应研究卡片 ---------- */
-  var orbitItems = document.querySelectorAll(".orbit-item");
-  Array.prototype.forEach.call(orbitItems, function (item) {
-    item.addEventListener("click", function (e) {
-      var id = item.getAttribute("data-target");
+  /* ---------- Hero 研究兴趣雷达图:悬停高亮 + 点击定位 ---------- */
+  var radarLabels = document.querySelectorAll(".radar-label");
+  Array.prototype.forEach.call(radarLabels, function (label) {
+    var axis = label.getAttribute("data-axis");
+    var id = label.getAttribute("data-target");
+    function setActive(on) {
+      var dot = document.querySelector('.radar-dot[data-axis="' + axis + '"]');
+      var spoke = document.querySelector('.radar-spoke[data-axis="' + axis + '"]');
+      if (dot) dot.classList.toggle("is-active", on);
+      if (spoke) spoke.classList.toggle("is-active", on);
+      label.classList.toggle("active", on);
+    }
+    label.addEventListener("mouseenter", function () { setActive(true); });
+    label.addEventListener("mouseleave", function () { setActive(false); });
+    label.addEventListener("focus", function () { setActive(true); });
+    label.addEventListener("blur", function () { setActive(false); });
+    label.addEventListener("click", function (e) {
       var target = id && document.getElementById(id);
       if (target) {
         e.preventDefault();
-        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
         target.classList.add("flash");
         setTimeout(function () { target.classList.remove("flash"); }, 1400);
       }
