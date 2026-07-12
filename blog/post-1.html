@@ -1,115 +1,76 @@
 <!DOCTYPE html>
-<html lang="zh" data-lang="zh" data-theme="light">
+<html lang="zh" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>用 Three.js 做一个可旋转的 3D 虚拟服装展示 · 花健</title>
-  <meta name="description" content="从 GLTF 模型加载到 orbit 控制器,几行代码在网页里转起一件衣服。A rotatable 3D garment viewer with Three.js." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <title>用 Three.js 做一个可旋转的 3D 虚拟服装展示 | 花健 · Jian Hua</title>
+  <meta name="description" content="用 Three.js 搭建可旋转、可缩放的 3D 虚拟服装展示的最小可运行示例。" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
 </head>
 <body>
-  <header class="site-header" id="top">
+  <header class="site-header">
     <nav class="nav container">
-      <a class="nav-brand" href="../index.html">
-        <span class="nav-monogram" aria-hidden="true">HJ</span>
-        <span>花健 <span class="brand-en">Jian Hua</span></span>
-      </a>
-      <button class="nav-toggle" id="navToggle" aria-label="菜单 / Menu" aria-expanded="false"><span></span><span></span><span></span></button>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="../index.html#about"><span class="lang-zh">关于</span><span class="lang-en">About</span></a></li>
-        <li><a href="../index.html#research"><span class="lang-zh">研究</span><span class="lang-en">Research</span></a></li>
-        <li><a href="../index.html#publications"><span class="lang-zh">论文</span><span class="lang-en">Publications</span></a></li>
-        <li><a href="../index.html#notes"><span class="lang-zh">笔记</span><span class="lang-en">Notes</span></a></li>
-        <li><a href="../index.html#news"><span class="lang-zh">动态</span><span class="lang-en">News</span></a></li>
-        <li><a href="../index.html#contact"><span class="lang-zh">联系</span><span class="lang-en">Contact</span></a></li>
-      </ul>
-      <div class="nav-tools">
-        <button class="theme-toggle" id="themeToggle" aria-label="切换主题 / Toggle theme" title="切换深色 / 浅色">
-          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-        <button class="lang-toggle" id="langToggle" aria-label="切换语言 / Switch language"><span class="lang-zh">EN</span><span class="lang-en">中</span></button>
-      </div>
+      <a class="nav-brand" href="../"><span class="nav-monogram" aria-hidden="true">HJ</span><span>花健 <span class="brand-en">Jian Hua</span></span></a>
+      <a class="btn btn-ghost" href="../">← <span>返回主页</span></a>
     </nav>
   </header>
 
-  <main>
-    <article class="section container post">
-      <a class="post-back" href="../index.html#notes">← <span class="lang-zh">返回笔记</span><span class="lang-en">Back to Notes</span></a>
-      <p class="post-meta">2026.07 · <span class="lang-zh">数字时尚</span><span class="lang-en">Digital Fashion</span></p>
-      <h1 class="post-title"><span class="lang-zh">用 Three.js 做一个可旋转的 3D 虚拟服装展示</span><span class="lang-en">A Rotatable 3D Garment Viewer with Three.js</span></h1>
+  <main class="container" style="padding-top:96px;padding-bottom:64px;">
+    <article class="post prose" style="margin:0 auto;">
+      <a class="post-back" href="../">← 返回主页 / Back to home</a>
+      <p class="post-meta">2026.07 · 数字时尚 · Digital Fashion</p>
+      <h1 class="post-title">用 Three.js 做一个可旋转的 3D 虚拟服装展示</h1>
 
-      <div class="prose">
-        <p>
-          <span class="lang-zh">把一件服装放进网页里自由旋转,是数字时尚最直观的呈现方式之一。借助 Three.js,这件事比想象中简单:加载模型、加灯光、挂一个轨道控制器即可。</span>
-          <span class="lang-en">Putting a garment into a web page and letting it spin freely is one of the most intuitive forms of digital fashion. With Three.js it is simpler than it looks: load a model, add lights, attach an orbit controller.</span>
-        </p>
+      <p>把一件衣服放进网页,让用户用鼠标自由旋转、缩放查看,是数字时尚最直观的展示方式之一。本文用 Three.js 搭一个最小可运行示例,不依赖任何打包工具,直接用 ES Module 即可。</p>
 
-        <h2><span class="lang-zh">最小可用代码</span><span class="lang-en">Minimal Code</span></h2>
-        <p>
-          <span class="lang-zh">先准备一个 <code>.gltf</code> 或 <code>.glb</code> 服装模型(可从 Clo3D / Marvelous Designer 导出),然后用 <code>GLTFLoader</code> 加载,并用 <code>OrbitControls</code> 实现鼠标拖拽旋转。</span>
-          <span class="lang-en">Prepare a <code>.gltf</code> or <code>.glb</code> garment model (export from Clo3D / Marvelous Designer), load it with <code>GLTFLoader</code>, and enable drag-to-rotate with <code>OrbitControls</code>.</span>
-        </p>
-        <pre class="code-block"><code>import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      <h2>1. 准备模型</h2>
+      <p>先用 Blender 或 CLO 3D 导出 <code>.glb</code>(GLTF 的二进制版,体积小、无需额外贴图文件)。把它放到项目的 <code>models/</code> 目录。</p>
+
+      <h2>2. 场景、相机、渲染器</h2>
+      <p>Three.js 的三件套:场景(Scene)、相机(PerspectiveCamera)、渲染器(WebGLRenderer)。把它们挂到一个容器 div 上,并让相机看向原点。</p>
+      <div class="code-block"><code>import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(45, w/h, 0.1, 100);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
 camera.position.set(0, 1, 3);
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(w, h); document.body.appendChild(renderer.domElement);
 
-const controls = new OrbitControls(camera, renderer.domElement);
-new GLTFLoader().load('garment.glb', g => scene.add(g.scene));</code></pre>
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+renderer.setSize(480, 480);
+document.getElementById('stage').appendChild(renderer.domElement);</code></div>
 
-        <h2><span class="lang-zh">再加一点质感</span><span class="lang-en">A Touch of Material</span></h2>
-        <p>
-          <span class="lang-zh">服装材质很吃灯光。给场景加一盏环境光加一盏方向光,并把模型材质设为略带粗糙度的 <code>MeshStandardMaterial</code>,布料的褶皱感会更真实。</span>
-          <span class="lang-en">Garments are light-hungry. Add an ambient light plus a directional light, and use a slightly rough <code>MeshStandardMaterial</code> so the fabric folds read more convincingly.</span>
-        </p>
-        <p>
-          <span class="lang-zh">到此,一个可旋转的虚拟服装展示就完成了。后续可以叠加换色、换面料、甚至接动作捕捉做虚拟人试穿。</span>
-          <span class="lang-en">That's a rotatable virtual garment viewer. Next you can layer on color/fabric swaps, or even motion-capture-driven virtual try-on.</span>
-        </p>
-      </div>
+      <h2>3. 加载模型 + 轨道控制器</h2>
+      <p><code>GLTFLoader</code> 读入模型,<code>OrbitControls</code> 负责"拖拽旋转、滚轮缩放"。加载完成后把模型加入场景,并用一个辅助函数让相机自动框住物体。</p>
+      <div class="code-block"><code>const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+new GLTFLoader().load('models/garment.glb', (g) => {
+  scene.add(g.scene);
+  fitCameraToObject(g.scene, camera, controls);
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+animate();</code></div>
+
+      <h2>4. 打光与环境</h2>
+      <p>服装材质对光很敏感。用 <code>HemisphereLight</code> 做环境光,加一盏 <code>DirectionalLight</code> 勾出褶皱阴影;若用 <code>MeshStandardMaterial</code>,建议再叠加一个基于图像的照明(IBL,如 RoomEnvironment),布料质感会真实很多。</p>
+
+      <h2>小结</h2>
+      <p>至此,一个可旋转、可缩放的 3D 服装展示就完成了。后续可以加自动旋转、换色、甚至布料物理模拟,把它做成产品级的虚拟试穿入口。下一篇会讲如何把模型批量、标准化地导出来喂给这里。</p>
     </article>
   </main>
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <div class="footer-copy">
-        <p>© <span id="year"></span> <span class="lang-zh">花健</span><span class="lang-en">Jian Hua</span>. <span class="lang-zh">保留所有权利。</span><span class="lang-en">All rights reserved.</span></p>
-        <p class="muted"><a href="../index.html"><span class="lang-zh">返回主页</span><span class="lang-en">Back to homepage</span></a></p>
-      </div>
-      <nav class="social" aria-label="社交链接 / Social links">
-        <a href="https://orcid.org/0009-0001-9173-520X" target="_blank" rel="noopener" aria-label="ORCID" class="social-orcid">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><text x="12" y="16" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#fff" font-weight="700">iD</text></svg>
-          <span class="sr-only">ORCID</span>
-        </a>
-        <a href="https://www.webofscience.com/wos/author/record/KWT-4826-2024" target="_blank" rel="noopener" aria-label="Web of Science">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></g></svg>
-          <span class="sr-only">Web of Science</span>
-        </a>
-        <a href="https://github.com/98HJ" target="_blank" rel="noopener" aria-label="GitHub">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.86.09-.66.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.04 10.04 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>
-          <span class="sr-only">GitHub</span>
-        </a>
-        <a href="mailto:jhua1014@163.com" aria-label="Email">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></g></svg>
-          <span class="sr-only">Email</span>
-        </a>
-      </nav>
+      <div class="footer-copy"><p>© <span class="year2"></span> 花健 Jian Hua. 保留所有权利。</p></div>
     </div>
   </footer>
-
-  <button class="to-top" id="toTop" aria-label="回到顶部 / Back to top" title="回到顶部">
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
-
-  <script src="../js/main.js"></script>
+  <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>
 </body>
 </html>

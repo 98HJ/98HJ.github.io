@@ -1,109 +1,58 @@
 <!DOCTYPE html>
-<html lang="zh" data-lang="zh" data-theme="light">
+<html lang="zh" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>可穿戴系统入门:从柔性传感器到数据可视化 · 花健</title>
-  <meta name="description" content="梳理一条最小可行链路:采集—传输—可视化,以及常见的坑。Wearable Systems 101: sense — transmit — visualize." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <title>可穿戴系统入门:从柔性传感器到数据可视化 | 花健 · Jian Hua</title>
+  <meta name="description" content="梳理可穿戴系统的最小可行链路:采集—传输—可视化,以及常见坑。" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/style.css" />
 </head>
 <body>
-  <header class="site-header" id="top">
+  <header class="site-header">
     <nav class="nav container">
-      <a class="nav-brand" href="../index.html">
-        <span class="nav-monogram" aria-hidden="true">HJ</span>
-        <span>花健 <span class="brand-en">Jian Hua</span></span>
-      </a>
-      <button class="nav-toggle" id="navToggle" aria-label="菜单 / Menu" aria-expanded="false"><span></span><span></span><span></span></button>
-      <ul class="nav-links" id="navLinks">
-        <li><a href="../index.html#about"><span class="lang-zh">关于</span><span class="lang-en">About</span></a></li>
-        <li><a href="../index.html#research"><span class="lang-zh">研究</span><span class="lang-en">Research</span></a></li>
-        <li><a href="../index.html#publications"><span class="lang-zh">论文</span><span class="lang-en">Publications</span></a></li>
-        <li><a href="../index.html#notes"><span class="lang-zh">笔记</span><span class="lang-en">Notes</span></a></li>
-        <li><a href="../index.html#news"><span class="lang-zh">动态</span><span class="lang-en">News</span></a></li>
-        <li><a href="../index.html#contact"><span class="lang-zh">联系</span><span class="lang-en">Contact</span></a></li>
-      </ul>
-      <div class="nav-tools">
-        <button class="theme-toggle" id="themeToggle" aria-label="切换主题 / Toggle theme" title="切换深色 / 浅色">
-          <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-        <button class="lang-toggle" id="langToggle" aria-label="切换语言 / Switch language"><span class="lang-zh">EN</span><span class="lang-en">中</span></button>
-      </div>
+      <a class="nav-brand" href="../"><span class="nav-monogram" aria-hidden="true">HJ</span><span>花健 <span class="brand-en">Jian Hua</span></span></a>
+      <a class="btn btn-ghost" href="../">← <span>返回主页</span></a>
     </nav>
   </header>
 
-  <main>
-    <article class="section container post">
-      <a class="post-back" href="../index.html#notes">← <span class="lang-zh">返回笔记</span><span class="lang-en">Back to Notes</span></a>
-      <p class="post-meta">2026.06 · <span class="lang-zh">可穿戴系统</span><span class="lang-en">Wearable Systems</span></p>
-      <h1 class="post-title"><span class="lang-zh">可穿戴系统入门:从柔性传感器到数据可视化</span><span class="lang-en">Wearable Systems 101: From Flexible Sensors to Data Viz</span></h1>
+  <main class="container" style="padding-top:96px;padding-bottom:64px;">
+    <article class="post prose" style="margin:0 auto;">
+      <a class="post-back" href="../">← 返回主页 / Back to home</a>
+      <p class="post-meta">2026.06 · 可穿戴系统 · Wearable Systems</p>
+      <h1 class="post-title">可穿戴系统入门:从柔性传感器到数据可视化</h1>
 
-      <div class="prose">
-        <p>
-          <span class="lang-zh">想做一件「会感知」的衣服,最该先想清楚的是数据链路,而不是先把传感器焊上去。一条最小可行链路只有三步:采集、传输、可视化。</span>
-          <span class="lang-en">To make a "perceiving" garment, clarify the data chain before soldering any sensor. A minimal viable chain has just three steps: sense, transmit, visualize.</span>
-        </p>
+      <p>可穿戴系统的本质,是把人体信号变成可读的数据。本文梳理一条"最小可行链路":采集 → 传输 → 可视化,作为上手的第一块拼图。</p>
 
-        <h2><span class="lang-zh">1. 采集</span><span class="lang-en">1. Sense</span></h2>
-        <p>
-          <span class="lang-zh">柔性传感器(压阻布、应变纱线、织物电极)输出的是微弱模拟信号,通常需要一个带放大与滤波的前端,再用 MCU 的 ADC 采样。</span>
-          <span class="lang-en">Flexible sensors (piezoresistive fabric, strain yarn, textile electrodes) output faint analog signals — usually needing an amplified, filtered frontend before MCU ADC sampling.</span>
-        </p>
+      <h2>1. 柔性传感器:系统的眼睛</h2>
+      <p>常见的柔性传感器包括:电阻式压力传感(织物压阻)、电容式接近传感,以及基于导电纱线的应变传感。它们能贴合皮肤弯曲,测量压力、拉伸、弯折等物理量。</p>
 
-        <h2><span class="lang-zh">2. 传输</span><span class="lang-en">2. Transmit</span></h2>
-        <p>
-          <span class="lang-zh">低功耗场景首选 BLE;数据量大再考虑 Wi-Fi。注意给每帧加上时间戳与传感器编号,后期对齐才不头疼。</span>
-          <span class="lang-en">BLE is the default for low power; choose Wi-Fi when throughput demands it. Stamp each frame with a timestamp and sensor id to ease later alignment.</span>
-        </p>
+      <h2>2. 信号链</h2>
+      <p>传感器 → 信号调理(放大 / 滤波)→ ADC(模数转换)→ MCU(如 ESP32)→ 无线(蓝牙 / Wi-Fi)→ 手机或电脑。柔性传感信号很弱,前端放大与工频滤波是关键。</p>
 
-        <h2><span class="lang-zh">3. 可视化</span><span class="lang-en">3. Visualize</span></h2>
-        <p>
-          <span class="lang-zh">接到网页端用 Canvas 或轻量图表库实时画线,先把「看得见」跑通,再谈算法。常见的坑:电源噪声、接触不良、采样率与动画帧率不一致。</span>
-          <span class="lang-en">Pipe it to the browser and draw live lines with Canvas or a light chart lib — get "visible" working before any algorithm. Common pitfalls: power noise, poor contact, and sample/animation rate mismatch.</span>
-        </p>
-        <p>
-          <span class="lang-zh">跑通这条链路,你就拥有了一个可穿戴系统的「hello world」,后面所有研究都建立在它之上。</span>
-          <span class="lang-en">Once this chain works, you have a wearable "hello world" — every later study builds on it.</span>
-        </p>
-      </div>
+      <h2>3. 传输与可视化</h2>
+      <p>MCU 通过 BLE 把数据推到手机。可视化可以用 Web Bluetooth + Chart.js 在网页实时画曲线,也可以用 Python(Matplotlib / Plotly)做离线分析。</p>
+      <div class="code-block"><code>// 浏览器侧:Web Bluetooth 读取特征值并绘图
+const device = await navigator.bluetooth.requestDevice({
+  filters: [{ services: ['wearable'] }]
+});
+const server = await device.gatt.connect();
+// ... 订阅特征值 → 推入 Chart.js 数据数组实时刷新</code></div>
+
+      <h2>常见坑</h2>
+      <p>· <strong>运动伪影</strong>:传感器随衣物滑动产生假信号,固定方式与基线校准很重要。<br>· <strong>功耗</strong>:无线传输是耗电大户,采样率与广播间隔要权衡。<br>· <strong>漂移</strong>:柔性材料蠕变,长时间需定期归零。</p>
+
+      <h2>小结</h2>
+      <p>先把这条链路跑通一个传感器、一个通道,再谈多模态融合。可穿戴系统的难点从来不在"能测",而在"测得稳、读得懂"。下一篇会深入传感器标定这一步。</p>
     </article>
   </main>
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <div class="footer-copy">
-        <p>© <span id="year"></span> <span class="lang-zh">花健</span><span class="lang-en">Jian Hua</span>. <span class="lang-zh">保留所有权利。</span><span class="lang-en">All rights reserved.</span></p>
-        <p class="muted"><a href="../index.html"><span class="lang-zh">返回主页</span><span class="lang-en">Back to homepage</span></a></p>
-      </div>
-      <nav class="social" aria-label="社交链接 / Social links">
-        <a href="https://orcid.org/0009-0001-9173-520X" target="_blank" rel="noopener" aria-label="ORCID" class="social-orcid">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="currentColor"/><text x="12" y="16" text-anchor="middle" font-size="10" font-family="sans-serif" fill="#fff" font-weight="700">iD</text></svg>
-          <span class="sr-only">ORCID</span>
-        </a>
-        <a href="https://www.webofscience.com/wos/author/record/KWT-4826-2024" target="_blank" rel="noopener" aria-label="Web of Science">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></g></svg>
-          <span class="sr-only">Web of Science</span>
-        </a>
-        <a href="https://github.com/98HJ" target="_blank" rel="noopener" aria-label="GitHub">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 2C6.48 2 2 6.58 2 12.25c0 4.53 2.87 8.37 6.84 9.73.5.1.68-.22.68-.49 0-.24-.01-.87-.01-1.71-2.78.62-3.37-1.37-3.37-1.37-.45-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.89 1.57 2.34 1.12 2.91.86.09-.66.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05a9.3 9.3 0 0 1 5 0c1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.81-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.81 0 .27.18.59.69.49A10.04 10.04 0 0 0 22 12.25C22 6.58 17.52 2 12 2z"/></svg>
-          <span class="sr-only">GitHub</span>
-        </a>
-        <a href="mailto:jhua1014@163.com" aria-label="Email">
-          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></g></svg>
-          <span class="sr-only">Email</span>
-        </a>
-      </nav>
+      <div class="footer-copy"><p>© <span class="year2"></span> 花健 Jian Hua. 保留所有权利。</p></div>
     </div>
   </footer>
-
-  <button class="to-top" id="toTop" aria-label="回到顶部 / Back to top" title="回到顶部">
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-  </button>
-
-  <script src="../js/main.js"></script>
+  <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>
 </body>
 </html>

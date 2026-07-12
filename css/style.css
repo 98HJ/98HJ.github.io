@@ -312,34 +312,22 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
   display: flex; flex-direction: column;
   background: var(--card);
   border: 1px solid var(--line);
-  border-top: 3px solid var(--note, var(--accent));
+  border-top: 3px solid var(--accent);
   border-radius: 14px; overflow: hidden; transform: perspective(760px) rotateX(0deg) rotateY(0deg);
   transition: box-shadow .25s, transform .25s, border-color .25s; will-change: transform;
 }
-.blog-card:hover {
-  text-decoration: none;
-  box-shadow: 0 16px 36px color-mix(in srgb, var(--note, var(--accent)) 26%, var(--shadow));
-  transform: perspective(760px) rotateX(0deg) rotateY(0deg) translateY(-3px);
-}
-/* 每张笔记卡片独立强调色,提升区分度(深浅主题通用) */
-.blog-grid .blog-card:nth-child(1) { --note: #c2683f; --note-soft: rgba(194, 104, 63, 0.10); }
-.blog-grid .blog-card:nth-child(2) { --note: #3f8a7d; --note-soft: rgba(63, 138, 125, 0.10); }
-.blog-grid .blog-card:nth-child(3) { --note: #7c5bb0; --note-soft: rgba(124, 91, 176, 0.10); }
-.blog-card { background: linear-gradient(180deg, var(--note-soft, transparent) 0%, var(--card) 46%); }
+.blog-card:hover { text-decoration: none; box-shadow: 0 16px 36px var(--shadow); transform: perspective(760px) rotateX(0deg) rotateY(0deg) translateY(-3px); border-color: var(--accent); }
 .blog-thumb { height: 130px; }
-.blog-thumb-1 { background: linear-gradient(135deg, #e3a877, #c2683f); }
-.blog-thumb-2 { background: linear-gradient(135deg, #7fbcb0, #3f8a7d); }
+.blog-thumb-1 { background: linear-gradient(135deg, #d9a679, #a85a3c); }
+.blog-thumb-2 { background: linear-gradient(135deg, #8fb0a8, #3f6f66); }
 .blog-thumb-3 { background: linear-gradient(135deg, #cdbfae, #8a7a66); }
-.blog-thumb-4 { background: linear-gradient(135deg, #b49ad9, #7c5bb0); }
+.blog-thumb-4 { background: linear-gradient(135deg, #b9a1d6, #6f4f9e); }
 .blog-thumb-5 { background: linear-gradient(135deg, #e0b27a, #b5783c); }
 .blog-thumb-6 { background: linear-gradient(135deg, #9fc0a8, #4f7d5e); }
-.blog-meta { font-size: .78rem; letter-spacing: .04em; color: var(--note, var(--accent)); text-transform: uppercase; padding: 16px 18px 0; font-weight: 500; }
+.blog-meta { font-size: .78rem; letter-spacing: .04em; color: var(--accent); text-transform: uppercase; padding: 16px 18px 0; font-weight: 500; }
 .blog-title { font-family: var(--serif-cjk); font-size: 1.08rem; font-weight: 600; margin: 6px 18px 8px; line-height: 1.4; }
 .blog-excerpt { color: var(--muted); font-size: .88rem; margin: 0 18px 14px; flex: 1; }
-.blog-more { font-size: .85rem; color: var(--note, var(--accent)); padding: 0 18px 18px; font-weight: 500; }
-
-/* 查看全部笔记 按钮 */
-.notes-more { margin-top: 26px; padding-left: 12px; }
+.blog-more { font-size: .85rem; color: var(--accent); padding: 0 18px 18px; font-weight: 500; }
 
 /* ---------- 动态时间线 ---------- */
 .timeline { list-style: none; margin: 16px 0 0; padding: 0; border-left: 2px solid var(--line); }

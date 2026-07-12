@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>用 Blender 批量导出服装数字资产 | 花健 · Jian Hua</title>
+  <meta name="description" content="用 Blender 脚本把服装批量导出为标准 glTF 资产,打通下游引擎。" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav container">
+      <a class="nav-brand" href="../"><span class="nav-monogram" aria-hidden="true">HJ</span><span>花健 <span class="brand-en">Jian Hua</span></span></a>
+      <a class="btn btn-ghost" href="../">← <span>返回主页</span></a>
+    </nav>
+  </header>
+
+  <main class="container" style="padding-top:96px;padding-bottom:64px;">
+    <article class="post prose" style="margin:0 auto;">
+      <a class="post-back" href="../">← 返回主页 / Back to home</a>
+      <p class="post-meta">2026.04 · 服装数字化 · Fashion Digitization</p>
+      <h1 class="post-title">用 Blender 批量导出服装数字资产</h1>
+
+      <p>做数字服装常要在 Blender 里管理几十件 garment,手工导出又慢又易错。用脚本批量转成标准 <code>.glb</code>,能直接喂给下游引擎(见上一篇的 Three.js 展示)。</p>
+
+      <h2>1. 组织场景</h2>
+      <p>把每件衣服放在独立的 Collection(如 <code>Garment_A</code> / <code>Garment_B</code>),命名即资产名,方便脚本按名遍历。</p>
+
+      <h2>2. 批量导出脚本</h2>
+      <div class="code-block"><code>import bpy, os
+out = "/path/to/assets"
+for col in bpy.data.collections:
+    if not col.name.startswith("Garment"):
+        continue
+    bpy.ops.export_scene.gltf(
+        filepath=os.path.join(out, col.name + ".glb"),
+        export_format='GLB',
+        use_active_collection=True,
+        export_selected=False
+    )</code></div>
+
+      <h2>3. 统一规范</h2>
+      <p>· 单位设为米,避免比例错乱;<br>· 烘焙法线 / 合并材质,减小体积;<br>· 保留顶点色或 UV,方便下游换色。</p>
+
+      <h2>4. 下游对接</h2>
+      <p>导出的 <code>.glb</code> 可直接进 Three.js、Unity 或虚幻。若要做虚拟试穿,记得保留骨骼与蒙皮信息,否则衣服无法随人体动作变形。</p>
+
+      <h2>小结</h2>
+      <p>把"导出"变成一行命令,你就能把精力放在设计本身,而不是重复的点击上。资产管线一旦标准化,迭代速度会明显提升。</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-copy"><p>© <span class="year2"></span> 花健 Jian Hua. 保留所有权利。</p></div>
+    </div>
+  </footer>
+  <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>
+</body>
+</html>
