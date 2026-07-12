@@ -1,1 +1,5 @@
 assets/photo.jpg
+
+# Python
+__pycache__/
+*.pyc
