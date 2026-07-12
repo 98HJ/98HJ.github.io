@@ -8,16 +8,22 @@
   <meta name="theme-color" content="#a85a3c" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
 
-  <!-- 社交分享卡片(Open Graph / Twitter) -->
+  <!-- 社交分享卡片(Open Graph / Twitter Card) -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content="花健 · 个人主页 | Jian Hua · Personal Homepage" />
   <meta property="og:description" content="苏州大学服装设计与工程博士研究生 · 数字时尚与可穿戴系统。Soochow University Ph.D. student — Digital Fashion & Wearable Systems." />
   <meta property="og:url" content="https://98HJ.github.io/" />
-  <meta property="og:image" content="assets/og-cover.svg" />
+  <meta property="og:image" content="https://98HJ.github.io/assets/og-cover.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="花健 Jian Hua · Digital Fashion & Wearable Systems" />
+  <meta property="og:locale" content="zh_CN" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="花健 · 个人主页 | Jian Hua · Personal Homepage" />
   <meta name="twitter:description" content="苏州大学服装设计与工程博士研究生 · 数字时尚与可穿戴系统。" />
-  <meta name="twitter:image" content="assets/og-cover.svg" />
+  <meta name="twitter:image" content="https://98HJ.github.io/assets/og-cover.png" />
+  <link rel="canonical" href="https://98HJ.github.io/" />
+  <meta name="robots" content="index, follow" />
 
   <!-- 结构化数据(提升搜索结果展示) -->
   <script type="application/ld+json">
@@ -30,9 +36,10 @@
     "affiliation": {
       "@type": "CollegeOrUniversity",
       "name": "Soochow University",
-      "department": "School of Fashion Design & Engineering"
+      "department": "College of Textile and Clothing Engineering"
     },
     "url": "https://98HJ.github.io/",
+    "image": "https://98HJ.github.io/assets/og-cover.png",
     "email": "mailto:jhua1014@163.com",
     "sameAs": [
       "https://orcid.org/0009-0001-9173-520X"
@@ -85,11 +92,11 @@
     <section class="hero">
       <div class="container hero-inner">
         <div class="hero-text reveal">
-          <p class="hero-eyebrow"><span class="lang-zh">博士研究生</span><span class="lang-en">Ph.D. Student, Fashion Design &amp; Engineering</span></p>
+          <p class="hero-eyebrow"><span class="lang-zh">博士研究生</span><span class="lang-en">Ph.D. Student</span></p>
           <h1 class="hero-name">花健 <span class="hero-name-en">Jian Hua</span></h1>
           <p class="hero-sub">
             <span class="lang-zh">数字时尚与可穿戴系统</span>
-            <span class="lang-en">Fashion Design &amp; Engineering · Digital Fashion &amp; Wearable Systems</span>
+            <span class="lang-en">Digital Fashion &amp; Wearable Systems</span>
           </p>
           <p class="hero-affil">
             <span class="lang-zh">苏州大学 服装设计与工程 · 导师：薛哲彬教授</span>
@@ -110,11 +117,24 @@
             <a class="btn btn-primary" href="#research"><span class="lang-zh">查看研究</span><span class="lang-en">View Research</span></a>
             <a class="btn btn-ghost" href="#notes"><span class="lang-zh">读读笔记</span><span class="lang-en">Read Notes</span></a>
           </div>
+          <ul class="hero-stats reveal">
+            <li><strong>2026</strong><span class="lang-zh">入学苏州大学</span><span class="lang-en">Joined Soochow</span></li>
+            <li><strong>05</strong><span class="lang-zh">研究方向</span><span class="lang-en">Research Themes</span></li>
+            <li><strong>02</strong><span class="lang-zh">交叉学科背景</span><span class="lang-en">Cross-disciplines</span></li>
+          </ul>
         </div>
         <div class="hero-photo reveal">
+          <div class="photo-3d">
+            <div class="photo-float">
           <img class="photo-img" id="siteAvatar" alt="花健" src="data:image/jpeg;base64,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">
           <span class="photo-ring" aria-hidden="true"></span>
+          <span class="photo-ring photo-ring--spin" aria-hidden="true"></span>
+          <span class="photo-chip photo-chip--1" aria-hidden="true">3D</span>
+          <span class="photo-chip photo-chip--2" aria-hidden="true">Wearable</span>
+          <span class="photo-chip photo-chip--3" aria-hidden="true">HCI</span>
         </div>
+      </div>
+    </div>
       </div>
     </section>
 

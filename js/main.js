@@ -131,4 +131,18 @@
   /* ---------- 页脚年份 ---------- */
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+  /* ---------- 3D 头像交互:指针倾斜 + 视差 ---------- */
+  var heroPhoto = document.querySelector(".hero-photo");
+  var stage = document.querySelector(".photo-3d");
+  var reduce3d = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (heroPhoto && stage && !reduce3d) {
+    heroPhoto.addEventListener("pointermove", function (e) {
+      var r = heroPhoto.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width - 0.5;
+      var py = (e.clientY - r.top) / r.height - 0.5;
+      stage.style.transform = "rotateY(" + (px * 18).toFixed(2) + "deg) rotateX(" + (-py * 18).toFixed(2) + "deg)";
+    });
+    heroPhoto.addEventListener("pointerleave", function () { stage.style.transform = ""; });
+  }
 })();
