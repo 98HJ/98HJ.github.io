@@ -184,4 +184,27 @@
       heroPhoto.addEventListener("pointercancel", endDrag);
     }
   }
+
+  /* ---------- 卡片 3D 微倾斜:研究卡片 / 笔记卡片 ---------- */
+  function enableTilt(selector, maxDeg) {
+    if (!window.matchMedia) return;
+    var fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fine || reduce) return;
+    var els = document.querySelectorAll(selector);
+    Array.prototype.forEach.call(els, function (el) {
+      el.style.transformStyle = "preserve-3d";
+      el.addEventListener("pointermove", function (e) {
+        var r = el.getBoundingClientRect();
+        var px = (e.clientX - r.left) / r.width - 0.5;
+        var py = (e.clientY - r.top) / r.height - 0.5;
+        el.style.transform = "perspective(760px) rotateY(" + (px * maxDeg).toFixed(2) + "deg) rotateX(" + (-py * maxDeg).toFixed(2) + "deg)";
+      });
+      el.addEventListener("pointerleave", function () {
+        el.style.transform = "";
+      });
+    });
+  }
+  enableTilt(".card", 7);
+  enableTilt(".blog-card", 6);
 })();

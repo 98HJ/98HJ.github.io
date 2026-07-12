@@ -88,6 +88,7 @@ html[data-lang="en"] .lang-en { display: inline; }
   .photo-float { animation: none; }
   .photo-ring--spin { animation: none; }
   .photo-3d { transition: none; }
+  .card, .blog-card { transform: none !important; }
 }
 
 /* ---------- 顶部导航 ---------- */
@@ -242,16 +243,26 @@ section[id] { scroll-margin-top: 84px; }
 .muted { color: var(--muted); font-size: .9rem; }
 code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; font-size: .88em; color: var(--accent-dark); }
 
+/* 模块内容轻微缩进,小标题保持左对齐在一条线 */
+.section .prose,
+.section .cards,
+.section .pub-list,
+.section .blog-grid,
+.section .timeline,
+.section .contact-list { padding-left: 12px; }
+#publications .muted, #notes .muted { padding-left: 12px; }
+
 /* ---------- 研究卡片 ---------- */
 .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
 .card {
   position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-  padding: 26px 26px 24px; overflow: hidden; transition: box-shadow .25s, transform .25s, border-color .25s;
+  padding: 26px 26px 24px; overflow: hidden; transform: perspective(760px) rotateX(0deg) rotateY(0deg);
+  transition: box-shadow .25s, transform .25s, border-color .25s; will-change: transform;
 }
 .card::before {
   content: ""; position: absolute; left: 0; top: 0; height: 3px; width: 0; background: var(--accent); transition: width .3s ease;
 }
-.card:hover { box-shadow: 0 14px 34px var(--shadow); transform: translateY(-3px); border-color: transparent; }
+.card:hover { box-shadow: 0 14px 34px var(--shadow); transform: perspective(760px) rotateX(0deg) rotateY(0deg) translateY(-3px); border-color: transparent; }
 .card:hover::before { width: 100%; }
 .card-num { font-family: var(--serif); font-style: italic; font-size: 1.4rem; color: var(--accent); opacity: .55; }
 .card h3 { font-family: var(--serif-cjk); font-size: 1.2rem; margin: 6px 0 8px; font-weight: 600; }
@@ -295,13 +306,17 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
 .blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
 .blog-card {
   display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line);
-  border-radius: 14px; overflow: hidden; transition: box-shadow .25s, transform .25s;
+  border-radius: 14px; overflow: hidden; transform: perspective(760px) rotateX(0deg) rotateY(0deg);
+  transition: box-shadow .25s, transform .25s; will-change: transform;
 }
-.blog-card:hover { text-decoration: none; box-shadow: 0 14px 34px var(--shadow); transform: translateY(-3px); }
+.blog-card:hover { text-decoration: none; box-shadow: 0 14px 34px var(--shadow); transform: perspective(760px) rotateX(0deg) rotateY(0deg) translateY(-3px); }
 .blog-thumb { height: 130px; }
 .blog-thumb-1 { background: linear-gradient(135deg, #d9a679, #a85a3c); }
 .blog-thumb-2 { background: linear-gradient(135deg, #8fb0a8, #3f6f66); }
 .blog-thumb-3 { background: linear-gradient(135deg, #cdbfae, #8a7a66); }
+.blog-thumb-4 { background: linear-gradient(135deg, #b9a1d6, #6f4f9e); }
+.blog-thumb-5 { background: linear-gradient(135deg, #e0b27a, #b5783c); }
+.blog-thumb-6 { background: linear-gradient(135deg, #9fc0a8, #4f7d5e); }
 .blog-meta { font-size: .78rem; letter-spacing: .04em; color: var(--accent); text-transform: uppercase; padding: 16px 18px 0; }
 .blog-title { font-family: var(--serif-cjk); font-size: 1.08rem; font-weight: 600; margin: 6px 18px 8px; line-height: 1.4; }
 .blog-excerpt { color: var(--muted); font-size: .88rem; margin: 0 18px 14px; flex: 1; }
@@ -320,8 +335,10 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
 
 /* ---------- 联系方式 ---------- */
 .contact-list { list-style: none; margin: 16px 0 0; padding: 0; }
-.contact-list li { display: flex; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--line); }
-.contact-label { min-width: 130px; color: var(--muted); font-size: .9rem; }
+.contact-list li { display: flex; align-items: baseline; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.contact-label { min-width: 116px; flex-shrink: 0; color: var(--muted); font-size: .9rem; }
+.contact-list li > a { color: var(--accent); }
+.contact-list li > span:last-child { color: var(--ink); }
 
 /* ---------- 页脚 ---------- */
 .site-footer { border-top: 1px solid var(--line); padding: 36px 0; background: var(--bg-alt); }
