@@ -182,11 +182,11 @@ html[data-lang="en"] .lang-en { display: inline; }
 
 .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
 
-/* ---------- hero 指标 ---------- */
-.hero-stats { display: flex; gap: 30px; margin: 30px 0 0; padding: 0; list-style: none; }
-.hero-stats li { display: flex; flex-direction: column; }
-.hero-stats strong { font-family: var(--serif); font-size: 1.7rem; color: var(--accent); line-height: 1; }
-.hero-stats span { font-size: .78rem; color: var(--muted); margin-top: 5px; }
+/* ---------- hero 近况 / Now ---------- */
+.hero-now { list-style: none; margin: 30px 0 0; padding: 0; max-width: 560px; display: flex; flex-direction: column; gap: 12px; }
+.hero-now li { display: flex; align-items: baseline; gap: 14px; font-size: .9rem; line-height: 1.55; }
+.hero-now .now-label { flex: 0 0 56px; color: var(--accent); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
+.hero-now .now-text { color: var(--text); }
 
 .hero-photo { position: relative; justify-self: end; width: 260px; height: 260px; perspective: 900px; }
 .photo-3d { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .25s ease-out; will-change: transform; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); }
@@ -411,7 +411,8 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
   .hero-photo { width: 150px; height: 150px; }
   .photo-img { width: 120px; height: 120px; top: 15px; left: 15px; }
   .photo-ring { top: 5px; left: 5px; right: 5px; bottom: 5px; }
-  .hero-stats { gap: 18px; }
+  .hero-now { gap: 10px; }
+  .hero-now .now-label { flex-basis: 52px; }
 }
 
 /* ---------- 文章页(blog) ---------- */
