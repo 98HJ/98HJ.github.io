@@ -183,61 +183,32 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- 全局统计(LeanCloud 国际版 · 国内可达 · 免费) ---------- */
+  /* ---------- 全局统计(腾讯云 SCF + COS · 国内可达 · 免费) ---------- */
   /*
-   * 真值源:LeanCloud(跨所有访客共享点赞/PV/UV);兜底:localStorage(离线或未配置时)。
-   * 用户在 LeanCloud 国际版(https://leancloud.app)建应用后,把 AppID / AppKey 填到下方常量。
-   * 控制台需把站点域名加入「设置 → 安全 → Web 安全域名」,否则浏览器请求被拒(CORS/403)。
+   * 真值源:腾讯云函数 SCF(读写 COS 计数文件),跨所有访客共享;兜底:localStorage。
+   * 用户在腾讯云建 SCF(Python) + COS 桶 + API 网关后,把 API 网关 base URL 填到 COUNTER_API。
+   * 接口约定: GET/POST {COUNTER_API}/counter?key=KEY[&delta=N] 返回 {"value":数字}
    * 未填写或不可达时,自动降级为 localStorage 本地模式(刷新不丢,但不跨设备共享)。
    */
-  var LC_APP_ID  = "____FILL_APP_ID____";    // ← 替换为你的 LeanCloud App ID
-  var LC_APP_KEY = "____FILL_APP_KEY____";   // ← 替换为你的 LeanCloud App Key(前端只用 AppKey,勿用 Master Key)
-  var LC_API = "https://api.leancloud.app/1.1";
-  var LC_CLASS = "SiteStat";                 // 统计类,首次写入自动创建,无需后台预建
-  var LC_READY = LC_APP_ID.indexOf("____") !== 0 && LC_APP_ID.length > 8;
+  var COUNTER_API = "____FILL_COUNTER_API____"; // ← 替换为你的 API 网关 base URL
+  var COUNTER_READY = COUNTER_API.indexOf("____") !== 0 && COUNTER_API.length > 8;
 
-  function lcHeaders() {
-    return { "X-LC-Id": LC_APP_ID, "X-LC-Key": LC_APP_KEY, "Content-Type": "application/json" };
-  }
-  function lcEnabled() { return LC_READY; }
-  // 找或建统计对象,返回 Promise<objectId>
-  function lcEnsure(key) {
-    if (!lcEnabled()) return Promise.reject("lc-disabled");
-    var url = LC_API + "/classes/" + LC_CLASS + "?where=" + encodeURIComponent(JSON.stringify({ key: key }));
-    return fetch(url, { headers: lcHeaders() }).then(function (r) { return r.json(); }).then(function (d) {
-      if (d.results && d.results.length) return d.results[0].objectId;
-      return fetch(LC_API + "/classes/" + LC_CLASS, {
-        method: "POST", headers: lcHeaders(),
-        body: JSON.stringify({ key: key, count: 0, ACL: { "*": { read: true, write: true } } })
-      }).then(function (r) { return r.json(); }).then(function (d) {
-        if (!d.objectId) throw new Error("lc-create-failed");
-        return d.objectId;
-      });
-    });
-  }
-  // 原子增减,返回新值(LeanCloud Increment 操作并发安全)
-  function lcIncr(key, delta) {
-    if (!lcEnabled()) return Promise.reject("lc-disabled");
-    return lcEnsure(key).then(function (id) {
-      return fetch(LC_API + "/classes/" + LC_CLASS + "/" + id, {
-        method: "PUT", headers: lcHeaders(),
-        body: JSON.stringify({ count: { "__op": "Increment", "amount": delta } })
-      }).then(function (r) { return r.json(); }).then(function (d) {
-        if (typeof d.count !== "number") throw new Error("lc-incr-no-count");
-        return d.count;
-      });
-    });
-  }
+  function counterHeaders() { return { "Content-Type": "application/json" }; }
+  function counterReady() { return COUNTER_READY; }
   // 读取当前值
-  function lcGet(key) {
-    if (!lcEnabled()) return Promise.reject("lc-disabled");
-    return lcEnsure(key).then(function (id) {
-      return fetch(LC_API + "/classes/" + LC_CLASS + "/" + id, { headers: lcHeaders() })
-        .then(function (r) { return r.json(); }).then(function (d) {
-          if (typeof d.count !== "number") throw new Error("lc-get-no-count");
-          return d.count;
-        });
-    });
+  function counterGet(key) {
+    if (!counterReady()) return Promise.reject("no-counter");
+    return fetch(COUNTER_API + "/counter?key=" + encodeURIComponent(key), { headers: counterHeaders() })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (typeof d.value !== "number") throw new Error("bad"); return d.value; });
+  }
+  // 增减(后端处理),返回新值
+  function counterIncr(key, delta) {
+    if (!counterReady()) return Promise.reject("no-counter");
+    return fetch(COUNTER_API + "/counter?key=" + encodeURIComponent(key) + "&delta=" + encodeURIComponent(delta),
+      { method: "POST", headers: counterHeaders() })
+      .then(function (r) { return r.json(); })
+      .then(function (d) { if (typeof d.value !== "number") throw new Error("bad"); return d.value; });
   }
 
   // ====== 点赞粒子迸发 ======
@@ -341,9 +312,9 @@
     likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
     renderLikes(localLikes);
 
-    // 后台用 LeanCloud 全局值覆盖本地(未配置/不可达时跳过,保留本地值)
-    if (lcEnabled()) {
-      lcGet("likes").then(function (v) {
+    // 后台用全局值覆盖本地(未配置/不可达时跳过,保留本地值)
+    if (counterReady()) {
+      counterGet("likes").then(function (v) {
         if (typeof v === "number" && v >= 0) { localLikes = v; saveLikes(); renderLikes(v); }
       }).catch(function () {});
     }
@@ -368,22 +339,22 @@
         localLikes += 1; renderLikes(localLikes); saveLikes();
         spawnParticles(likeBtn);
         celebrateLike(likeBtn);
-        if (lcEnabled()) {
-          lcIncr("likes", 1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); }).catch(function () {});
+        if (counterReady()) {
+          counterIncr("likes", 1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); }).catch(function () {});
         }
       } else {
         // 取消:本地立即 -1 并持久化
         localLikes = Math.max(0, localLikes - 1); renderLikes(localLikes); saveLikes();
-        // 后台全局 -1(仅 LeanCloud 启用;失败回滚本地状态)
-        if (lcEnabled()) {
-          lcIncr("likes", -1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); })
+        // 后台全局 -1(仅计数器启用;失败回滚本地状态)
+        if (counterReady()) {
+          counterIncr("likes", -1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); })
             .catch(function () { revertLike(); });
         }
       }
     });
   }
 
-  // ====== 访客统计(PV 每次访问+1 / UV 首次访问+1;LeanCloud 全局同步 + localStorage 兜底) ======
+  // ====== 访客统计(PV 每次访问+1 / UV 首次访问+1;腾讯云全局同步 + localStorage 兜底) ======
   var uvEl = document.getElementById("siteUv");
   var pvEl = document.getElementById("sitePv");
 
@@ -395,8 +366,8 @@
     localPv += 1;
     try { localStorage.setItem(LOCAL_PV_KEY, String(localPv)); } catch (e) {}
     pvEl.textContent = String(localPv);
-    if (lcEnabled()) {
-      lcIncr("site-pv", 1).then(function (v) { pvEl.textContent = String(v); }).catch(function () {});
+    if (counterReady()) {
+      counterIncr("site-pv", 1).then(function (v) { pvEl.textContent = String(v); }).catch(function () {});
     }
   }
 
@@ -405,12 +376,12 @@
     var uvSeen = false;
     try { uvSeen = localStorage.getItem("site-uv-seen") === "1"; } catch (e) {}
     uvEl.textContent = "1";
-    if (lcEnabled()) {
+    if (counterReady()) {
       if (!uvSeen) {
-        lcIncr("site-uv", 1).then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
+        counterIncr("site-uv", 1).then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
         try { localStorage.setItem("site-uv-seen", "1"); } catch (e) {}
       } else {
-        lcGet("site-uv").then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
+        counterGet("site-uv").then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
       }
     }
   }
