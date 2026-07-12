@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>document.documentElement.classList.add('js');</script>
   <title>可穿戴系统入门:从柔性传感器到数据可视化 | 花健 · Jian Hua</title>
   <meta name="description" content="梳理可穿戴系统的最小可行链路:采集—传输—可视化,以及常见坑。" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
@@ -23,6 +24,7 @@
       <p class="post-meta">2026.06 · 可穿戴系统 · Wearable Systems</p>
       <h1 class="post-title">可穿戴系统入门:从柔性传感器到数据可视化</h1>
 
+      <div class="prose">
       <p>可穿戴系统的本质,是把人体信号变成可读的数据。本文梳理一条"最小可行链路":采集 → 传输 → 可视化,作为上手的第一块拼图。</p>
 
       <h2>1. 柔性传感器:系统的眼睛</h2>
@@ -45,6 +47,7 @@ const server = await device.gatt.connect();
 
       <h2>小结</h2>
       <p>先把这条链路跑通一个传感器、一个通道,再谈多模态融合。可穿戴系统的难点从来不在"能测",而在"测得稳、读得懂"。下一篇会深入传感器标定这一步。</p>
+      </div>
     </article>
   </main>
 
@@ -53,6 +56,15 @@ const server = await device.gatt.connect();
       <div class="footer-copy"><p>© <span class="year2"></span> 花健 Jian Hua. 保留所有权利。</p></div>
     </div>
   </footer>
+  <script src="../js/main.js"></script>
+  <script>
+    // 兜底:主脚本未成功初始化时,直接显示渐显元素,避免空白
+    window.addEventListener('load', function () {
+      if (!window.__siteReady) {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    });
+  </script>
   <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>
 </body>
 </html>

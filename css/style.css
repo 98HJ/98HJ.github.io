@@ -80,10 +80,11 @@ html[data-lang="en"] .lang-zh { display: none; }
 html[data-lang="en"] .lang-en { display: inline; }
 
 /* ---------- 滚动渐显 ---------- */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
-.reveal.is-visible { opacity: 1; transform: none; }
+/* 仅在启用 JS 时隐藏(.js),避免脚本未加载导致内容永久不可见 */
+.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+.js .reveal.is-visible { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
+  .js .reveal { opacity: 1; transform: none; transition: none; }
   html { scroll-behavior: auto; }
   .photo-float { animation: none; }
   .photo-ring--spin { animation: none; }
@@ -328,6 +329,10 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
 .blog-title { font-family: var(--serif-cjk); font-size: 1.08rem; font-weight: 600; margin: 6px 18px 8px; line-height: 1.4; }
 .blog-excerpt { color: var(--muted); font-size: .88rem; margin: 0 18px 14px; flex: 1; }
 .blog-more { font-size: .85rem; color: var(--accent); padding: 0 18px 18px; font-weight: 500; }
+
+/* 笔记区“查看全部”按钮 */
+.notes-more { margin-top: 30px; text-align: center; }
+.notes-more .btn { font-size: .92rem; }
 
 /* ---------- 动态时间线 ---------- */
 .timeline { list-style: none; margin: 16px 0 0; padding: 0; border-left: 2px solid var(--line); }

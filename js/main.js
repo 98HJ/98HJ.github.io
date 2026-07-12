@@ -49,13 +49,19 @@
   }
   var savedLang = null;
   try { savedLang = localStorage.getItem(LANG_KEY); } catch (e) {}
-  setLang(savedLang === "en" ? "en" : "zh");
 
   if (toggle) {
+    // 首页:启用中 / 英切换
+    setLang(savedLang === "en" ? "en" : "zh");
     toggle.addEventListener("click", function () {
       var cur = root.getAttribute("data-lang");
       setLang(cur === "zh" ? "en" : "zh");
     });
+  } else {
+    // 子页面(笔记 / 归档):仅中文。强制 zh,避免套用首页已保存的英文偏好,
+    // 否则没有英文文本的中文页面会被 CSS 全部隐藏,看起来像"打开后是空白 / 报错"。
+    root.setAttribute("data-lang", "zh");
+    root.lang = "zh";
   }
 
   /* ---------- 移动端菜单 ---------- */
@@ -176,4 +182,7 @@
   }
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
+
+  // 标记脚本已初始化(供子页面兜底脚本判断,避免渐显元素因脚本未加载而永久隐藏)
+  window.__siteReady = true;
 })();

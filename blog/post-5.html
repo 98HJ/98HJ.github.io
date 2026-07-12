@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>document.documentElement.classList.add('js');</script>
   <title>读论文的卡片笔记法 | 花健 · Jian Hua</title>
   <meta name="description" content="用 Zettelkasten 卡片笔记法把读论文从消费变成积累。" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
@@ -23,6 +24,7 @@
       <p class="post-meta">2026.03 · 研究方法 · Research Methods</p>
       <h1 class="post-title">读论文的卡片笔记法</h1>
 
+      <div class="prose">
       <p>文献越读越多,却总记不住、串不起来。Zettelkasten(卡片盒)方法用一个简单原则破局:原子化 + 链接。</p>
 
       <h2>1. 什么是卡片笔记</h2>
@@ -39,6 +41,7 @@
 
       <h2>小结</h2>
       <p>卡片笔记不是"收藏",而是"思考的外置"。它把读论文从消费变成积累,久了会形成你自己的研究地图。</p>
+      </div>
     </article>
   </main>
 
@@ -47,6 +50,15 @@
       <div class="footer-copy"><p>© <span class="year2"></span> 花健 Jian Hua. 保留所有权利。</p></div>
     </div>
   </footer>
+  <script src="../js/main.js"></script>
+  <script>
+    // 兜底:主脚本未成功初始化时,直接显示渐显元素,避免空白
+    window.addEventListener('load', function () {
+      if (!window.__siteReady) {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    });
+  </script>
   <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>
 </body>
 </html>

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>document.documentElement.classList.add('js');</script>
   <title>用 Blender 批量导出服装数字资产 | 花健 · Jian Hua</title>
   <meta name="description" content="用 Blender 脚本把服装批量导出为标准 glTF 资产,打通下游引擎。" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23a85a3c'/><text x='32' y='43' font-family='Georgia,serif' font-size='30' fill='white' text-anchor='middle'>HJ</text></svg>" />
@@ -23,6 +24,7 @@
       <p class="post-meta">2026.04 · 服装数字化 · Fashion Digitization</p>
       <h1 class="post-title">用 Blender 批量导出服装数字资产</h1>
 
+      <div class="prose">
       <p>做数字服装常要在 Blender 里管理几十件 garment,手工导出又慢又易错。用脚本批量转成标准 <code>.glb</code>,能直接喂给下游引擎(见上一篇的 Three.js 展示)。</p>
 
       <h2>1. 组织场景</h2>
@@ -49,6 +51,7 @@ for col in bpy.data.collections:
 
       <h2>小结</h2>
       <p>把"导出"变成一行命令,你就能把精力放在设计本身,而不是重复的点击上。资产管线一旦标准化,迭代速度会明显提升。</p>
+      </div>
     </article>
   </main>
 
@@ -57,6 +60,15 @@ for col in bpy.data.collections:
       <div class="footer-copy"><p>© <span class="year2"></span> 花健 Jian Hua. 保留所有权利。</p></div>
     </div>
   </footer>
+  <script src="../js/main.js"></script>
+  <script>
+    // 兜底:主脚本未成功初始化时,直接显示渐显元素,避免空白
+    window.addEventListener('load', function () {
+      if (!window.__siteReady) {
+        document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+      }
+    });
+  </script>
   <script>document.querySelector('.year2').textContent = new Date().getFullYear();</script>
 </body>
 </html>
