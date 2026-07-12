@@ -183,9 +183,18 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- 全局点赞 + 访客统计(CountAPI,零后端、跨访客累计) ---------- */
+  /* ---------- 点赞 + 访客统计(本地优先 / CountAPI 可选增强) ---------- */
+  /*
+   * 设计原则:
+   * 1) 本地 localStorage 为主:点赞数/PV/UV 刷新后保留,离线完整可用
+   * 2) CountAPI 为可选增强:仅当 DNS 可达且返回有效值时,才把本地值对齐到全局
+   * 3) 命名空间统一为 "jianhua-site"(注意拼写)
+   *
+   * 注: api.countapi.xyz 在中国大陆常被墙(ERR_NAME_NOT_RESOLVED),
+   *    此时所有统计自动降级为纯本地模式,不影响用户体验。
+   */
   var COUNTAPI = "https://api.countapi.xyz";
-  var NS = "jianhua-site";
+  var NS = "jianhua-site"; // 统一命名空间(注意: j-i-a-n-h-u-a)
 
   function capiHit(ns, key) {
     return fetch(COUNTAPI + "/hit/" + ns + "/" + key).then(function (r) { return r.json(); });
@@ -197,7 +206,7 @@
     return fetch(COUNTAPI + "/update/" + ns + "/" + key + "/" + encodeURIComponent(value)).then(function (r) { return r.json(); });
   }
 
-  // 点赞粒子迸发(纯 CSS 动画 + JS 生成,尊重 reduced-motion)
+  // ====== 点赞粒子迸发 ======
   function spawnParticles(btn) {
     if (!btn) return;
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -281,29 +290,33 @@
     })(thanks);
   }
 
-  // 全局点赞:每个浏览器仅计一次,计数跨所有访客累加
+  // ====== 点赞(本地 localStorage 持久化,刷新不丢;CountAPI 可选全局同步) ======
   var likeBtn = document.getElementById("likeBtn");
   var likeCount = document.getElementById("likeCount");
   if (likeBtn) {
-    var LIKE_KEY = "site-liked";       // 本浏览器是否已赞(防重复/支持取消)
-    var LIKES_CACHE = "site-likes-cache"; // 上次成功拉到的全局基数(离线也能显示)
+    var LIKE_KEY = "site-liked";       // 本浏览器是否已赞
+    var LIKES_KEY = "site-likes-count"; // 本地持久化点赞数(刷新后恢复)
     var liked = false;
     try { liked = localStorage.getItem(LIKE_KEY) === "1"; } catch (e) {}
-    // 基数:优先用本地缓存(避免一直显示 0),联网后会被真实全局值覆盖
-    var base = 0;
-    try { var cb = parseInt(localStorage.getItem(LIKES_CACHE), 10); if (!isNaN(cb)) base = cb; } catch (e) {}
+    // 从 localStorage 读取持久化的点赞数(默认 0)
+    var localLikes = 0;
+    try { var lv = parseInt(localStorage.getItem(LIKES_KEY), 10); if (!isNaN(lv) && lv >= 0) localLikes = lv; } catch (e) {}
     function renderLikes(v) { if (likeCount) likeCount.textContent = String(v); }
-    function persistBase() { try { localStorage.setItem(LIKES_CACHE, String(base)); } catch (e) {} }
+    function saveLikes() { try { localStorage.setItem(LIKES_KEY, String(localLikes)); } catch (e) {} }
     likeBtn.classList.toggle("liked", liked);
     likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
-    renderLikes(base); // 立即显示(缓存或 0),不空白
+    renderLikes(localLikes);
 
-    // 后台拉取真实全局值:在线则对齐,离线保持本地缓存
+    // 后台尝试拉取全局值(仅当 CountAPI 可达时才覆盖本地值)
     capiGet(NS, "likes").then(function (d) {
-      if (d && typeof d.value === "number") { base = d.value; persistBase(); renderLikes(base); }
-    }).catch(function () {});
+      if (d && typeof d.value === "number" && d.value >= 0) {
+        localLikes = d.value; saveLikes(); renderLikes(localLikes);
+      }
+    }).catch(function () {
+      /* CountAPI 不可达(被墙/离线):保持本地值,不做任何事 */
+    });
 
-    // 取消点赞写入全局失败时,回滚本地状态保持与全局一致
+    // 取消写入全局失败时的回滚
     function revertLike() {
       liked = true;
       try { localStorage.setItem(LIKE_KEY, "1"); } catch (e) {}
@@ -311,56 +324,68 @@
       likeBtn.setAttribute("aria-pressed", "true");
     }
     likeBtn.addEventListener("click", function () {
-      liked = !liked; // 切换:点赞 <-> 取消
+      liked = !liked;
       try { localStorage.setItem(LIKE_KEY, liked ? "1" : "0"); } catch (e) {}
       likeBtn.classList.toggle("liked", liked);
       likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
-      likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop"); // 回弹反馈
+      likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
 
       if (liked) {
-        // 乐观更新:本地先 +1(无论是否联网,点击必有反馈),联网后再对齐真实全局值
-        base += 1; renderLikes(base);
+        // 点赞:本地立即 +1 并持久化 → 刷新后仍在
+        localLikes += 1; renderLikes(localLikes); saveLikes();
         spawnParticles(likeBtn);
         celebrateLike(likeBtn);
+        // 后台尝试同步到 CountAPI(失败静默忽略)
         capiHit(NS, "likes").then(function (d) {
-          if (d && typeof d.value === "number") { base = d.value; persistBase(); renderLikes(base); }
+          if (d && typeof d.value === "number") { localLikes = d.value; saveLikes(); renderLikes(localLikes); }
         }).catch(function () {});
       } else {
-        // 乐观更新:本地先 -1
-        base = Math.max(0, base - 1); renderLikes(base);
-        // 后台把全局值 -1(读当前值再写回 v-1;CountAPI 免令牌 /update,GET 无 CORS 预检)
+        // 取消:本地立即 -1 并持久化
+        localLikes = Math.max(0, localLikes - 1); renderLikes(localLikes); saveLikes();
+        // 后台尝试把全局值 -1(失败则回滚本地状态)
         capiGet(NS, "likes").then(function (d) {
           var v = (d && typeof d.value === "number") ? d.value : 0;
           if (v <= 0) return;
           return capiUpdate(NS, "likes", v - 1);
         }).then(function (d) {
-          if (d && typeof d.value === "number") { base = d.value; persistBase(); renderLikes(base); }
-          else if (d === undefined) { /* v<=0 分支,无需处理 */ }
-          else { revertLike(); } // 更新未返回有效值 -> 回滚
+          if (d && typeof d.value === "number") { localLikes = d.value; saveLikes(); renderLikes(localLikes); }
+          else if (d !== undefined) { revertLike(); }
         }).catch(function () { revertLike(); });
       }
     });
   }
 
-  // 访客统计(全局 UV / PV;本地 file:// 或离线时显示 —)
+  // ====== 访客统计(本地优先:PV 每次访问+1 / UV 首次访问标记;CountAPI 可选增强) ======
   var uvEl = document.getElementById("siteUv");
   var pvEl = document.getElementById("sitePv");
+
+  // PV:本地计数器(每次页面加载 +1,刷新后累加)
+  var LOCAL_PV_KEY = "site-pv-local";
   if (pvEl) {
+    var localPv = 0;
+    try { var pv = parseInt(localStorage.getItem(LOCAL_PV_KEY), 10); if (!isNaN(pv) && pv >= 0) localPv = pv; } catch (e) {}
+    localPv += 1;
+    try { localStorage.setItem(LOCAL_PV_KEY, String(localPv)); } catch (e) {}
+    pvEl.textContent = String(localPv);
+    // 后台尝试同步到 CountAPI
     capiHit(NS, "site-pv").then(function (d) {
       if (d && typeof d.value === "number") pvEl.textContent = String(d.value);
     }).catch(function () {});
   }
+
+  // UV:基于 localStorage 的首次访问标记(本机固定为 1)
   if (uvEl) {
     var uvSeen = false;
     try { uvSeen = localStorage.getItem("site-uv-seen") === "1"; } catch (e) {}
-    var done = function (d) { if (d && typeof d.value === "number") uvEl.textContent = String(d.value); };
-    if (uvSeen) {
-      capiGet(NS, "site-uv").then(done).catch(function () {});
-    } else {
-      capiHit(NS, "site-uv").then(function (d) {
-        done(d);
-        try { localStorage.setItem("site-uv-seen", "1"); } catch (e) {}
-      }).catch(function () {});
+    uvEl.textContent = "1"; // 本机至少 1 个访客(你自己)
+    // 后台尝试从 CountAPI 获取真实全局 UV(仅当可达时替换显示)
+    capiGet(NS, "site-uv").then(function (d) {
+      if (d && typeof d.value === "number") uvEl.textContent = String(d.value);
+    }).catch(function () {});
+    if (!uvSeen) {
+      try { localStorage.setItem("site-uv-seen", "1"); } catch (e) {}
+      // 标记本机为新 UV,通知 CountAPI
+      capiHit(NS, "site-uv").catch(function () {});
     }
   }
 
