@@ -224,6 +224,60 @@
     }
   }
 
+  // 点赞全屏庆祝(心形升起铺满视口 + 居中致谢卡片;尊重 reduced-motion)
+  function celebrateLike(btn) {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var layer = document.querySelector(".like-celebrate");
+    if (!layer) {
+      layer = document.createElement("div");
+      layer.className = "like-celebrate";
+      document.body.appendChild(layer);
+    }
+    var rect = btn ? btn.getBoundingClientRect() : null;
+    var ox = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+    var oy = rect ? rect.top + rect.height / 2 : window.innerHeight * 0.6;
+    var palette = ["#a85a3c", "#d98c6a", "#e0533d", "#f0c5b0", "#c2683f"];
+    var HEART = "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z";
+    var N = 16;
+    for (var i = 0; i < N; i++) {
+      var h = document.createElement("span");
+      h.className = "celebrate-heart";
+      var size = (14 + Math.random() * 16).toFixed(0);
+      var dx = (Math.random() * 160 - 80).toFixed(0);
+      var rise = (window.innerHeight * (0.85 + Math.random() * 0.5)).toFixed(0);
+      var rot = (Math.random() * 80 - 40).toFixed(0);
+      var sc = (0.8 + Math.random() * 0.8).toFixed(2);
+      var dur = (1.6 + Math.random() * 1.1).toFixed(2);
+      var delay = (Math.random() * 0.25).toFixed(2);
+      h.style.left = ox + "px";
+      h.style.top = oy + "px";
+      h.style.width = size + "px";
+      h.style.height = size + "px";
+      h.style.setProperty("--dx", dx + "px");
+      h.style.setProperty("--rise", "-" + rise + "px");
+      h.style.setProperty("--rot", rot + "deg");
+      h.style.setProperty("--sc", sc);
+      h.style.setProperty("--dur", dur + "s");
+      h.style.animationDelay = delay + "s";
+      h.innerHTML = '<svg viewBox="0 0 24 24" width="100%" height="100%"><path fill="' + palette[i % palette.length] + '" d="' + HEART + '"/></svg>';
+      layer.appendChild(h);
+      (function (node) {
+        var rm = function () { if (node.parentNode) node.parentNode.removeChild(node); };
+        node.addEventListener("animationend", rm);
+        setTimeout(rm, 3600);
+      })(h);
+    }
+    var thanks = document.createElement("div");
+    thanks.className = "like-thanks";
+    thanks.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#e0533d" d="' + HEART + '"/></svg><span class="t-zh">感谢你的喜欢</span><span class="t-en">Thanks for the like</span>';
+    document.body.appendChild(thanks);
+    (function (node) {
+      var rm = function () { if (node.parentNode) node.parentNode.removeChild(node); };
+      node.addEventListener("animationend", rm);
+      setTimeout(rm, 2300);
+    })(thanks);
+  }
+
   // 全局点赞:每个浏览器仅计一次,计数跨所有访客累加
   var likeBtn = document.getElementById("likeBtn");
   var likeCount = document.getElementById("likeCount");
@@ -245,6 +299,7 @@
       likeBtn.setAttribute("aria-pressed", "true");
       likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
       spawnParticles(likeBtn);
+      celebrateLike(likeBtn);
       capiHit(NS, "likes").then(function (d) {
         if (d && typeof d.value === "number" && likeCount) likeCount.textContent = String(d.value);
       }).catch(function () {});

@@ -251,6 +251,32 @@ html[data-lang="en"] .lang-en { display: inline; }
 }
 .like-hint { font-size: .82rem; color: var(--muted); margin: 0; }
 
+/* 点赞全屏庆祝(心形升起铺满视口 + 居中致谢卡片) */
+.like-celebrate { position: fixed; inset: 0; pointer-events: none; z-index: 90; overflow: hidden; }
+.celebrate-heart { position: absolute; will-change: transform, opacity; animation: celebrate-rise var(--dur, 2s) cubic-bezier(.22,.61,.36,1) forwards; }
+.celebrate-heart svg { display: block; }
+@keyframes celebrate-rise {
+  0%   { transform: translate(0, 0) scale(.4) rotate(0); opacity: 0; }
+  14%  { opacity: 1; }
+  100% { transform: translate(var(--dx, 0), var(--rise, -600px)) scale(var(--sc, 1)) rotate(var(--rot, 0)); opacity: 0; }
+}
+.like-thanks {
+  position: fixed; left: 50%; top: 42%; transform: translate(-50%, -50%);
+  z-index: 95; pointer-events: none; padding: 16px 28px; border-radius: 18px;
+  background: var(--card); border: 1px solid var(--line); box-shadow: 0 20px 50px var(--shadow);
+  display: flex; align-items: center; gap: 12px; font-family: var(--serif-cjk); color: var(--ink);
+  opacity: 0; animation: thanks-in 1.9s ease forwards;
+}
+.like-thanks svg { width: 26px; height: 26px; flex-shrink: 0; }
+.like-thanks .t-zh { font-size: 1.15rem; font-weight: 600; }
+.like-thanks .t-en { font-family: var(--serif); font-style: italic; font-size: .9rem; color: var(--accent); margin-left: 6px; }
+@keyframes thanks-in {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(.7); }
+  16%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  74%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -58%) scale(1); }
+}
+
 /* ---------- 页脚访客统计 ---------- */
 .visitor { margin-top: 14px; font-size: .8rem; color: var(--muted); }
 .visitor .lang-en { margin-left: 2px; }
