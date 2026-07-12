@@ -90,7 +90,7 @@ html[data-lang="en"] .lang-en { display: inline; }
   .photo-ring--spin { animation: none; }
   .photo-3d { transition: none; }
   .card, .blog-card { transform: none !important; }
-  .radar-area { animation: none; }
+  .like-btn.pop .like-heart { animation: none; }
 }
 
 /* ---------- 顶部导航 ---------- */
@@ -183,27 +183,32 @@ html[data-lang="en"] .lang-en { display: inline; }
 
 .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
 
-/* ---------- hero 研究兴趣雷达图 ---------- */
-.hero-radar { position: relative; width: 280px; height: 240px; max-width: 100%; margin: 34px 0 0; }
-.radar-svg { position: absolute; left: 40px; top: 20px; width: 200px; height: 200px; overflow: visible; }
-.radar-grid { fill: none; stroke: rgba(168, 90, 60, .18); stroke-width: 1; }
-.radar-spoke { stroke: rgba(168, 90, 60, .28); stroke-width: 1; transition: stroke .25s, stroke-width .25s; }
-.radar-area {
-  fill: rgba(168, 90, 60, .22); stroke: var(--accent); stroke-width: 1.6; stroke-linejoin: round;
-  transform-box: fill-box; transform-origin: center; animation: radar-breathe 4.5s ease-in-out infinite;
+/* ---------- hero 社交互动(点赞) ---------- */
+.hero-social { margin: 34px 0 0; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.like-btn {
+  display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
+  background: var(--card); border: 1px solid var(--line); border-radius: 999px;
+  padding: 10px 20px; font-family: inherit; color: var(--text); font-size: .95rem;
+  box-shadow: 0 8px 22px var(--shadow); transition: border-color .25s, transform .15s, box-shadow .25s;
 }
-@keyframes radar-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.045); } }
-.radar-dot { fill: var(--accent); stroke: var(--card); stroke-width: 1.5; transition: fill .2s, stroke .2s, r .2s; transform-box: fill-box; transform-origin: center; }
-.radar-label {
-  position: absolute; transform: translate(-50%, -50%); background: none; border: 0;
-  padding: 2px 5px; cursor: pointer; font-family: inherit; line-height: 1.15; text-align: center;
-  color: var(--text); font-size: .72rem; border-radius: 6px; transition: color .2s, background .2s;
-}
-.radar-label .lang-en { display: block; font-size: .58rem; color: var(--muted); margin-top: 1px; transition: color .2s; }
-.radar-label:hover, .radar-label.active, .radar-label:focus-visible { color: var(--accent); background: rgba(168, 90, 60, .12); outline: none; }
-.radar-label:hover .lang-en, .radar-label.active .lang-en, .radar-label:focus-visible .lang-en { color: var(--accent); }
-.hero-radar .radar-spoke.is-active { stroke: var(--accent); stroke-width: 1.8; }
-.hero-radar .radar-dot.is-active { fill: var(--card); stroke: var(--accent); stroke-width: 2.4; }
+.like-btn:hover { border-color: var(--accent); transform: translateY(-2px); }
+.like-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.like-heart { font-size: 1.2rem; line-height: 1; color: var(--muted); transition: color .25s, transform .25s; }
+.like-btn.liked .like-heart { color: #e0533d; transform: scale(1.08); }
+.like-btn.pop .like-heart { animation: like-pop .45s ease; }
+@keyframes like-pop { 0% { transform: scale(1); } 30% { transform: scale(1.4); } 60% { transform: scale(.9); } 100% { transform: scale(1.08); } }
+.like-count { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent); }
+.like-hint { font-size: .82rem; color: var(--muted); margin: 0; }
+
+/* ---------- 页脚访客统计 ---------- */
+.visitor { margin-top: 14px; font-size: .8rem; color: var(--muted); }
+.visitor .lang-en { margin-left: 2px; }
+.visitor #busuanzi_value_site_uv, .visitor #busuanzi_value_site_pv { color: var(--accent); font-weight: 600; }
+
+/* ---------- 笔记评论区(Giscus) ---------- */
+.comments { padding: 52px 0 8px; }
+.comments-title { font-size: 1.15rem; margin-bottom: 18px; color: var(--text); }
+.comments-title .lang-en { font-size: .8rem; color: var(--muted); margin-left: 6px; }
 .card.flash { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(168, 90, 60, .25), 0 18px 40px var(--shadow); }
 
 .hero-photo { position: relative; justify-self: end; width: 260px; height: 260px; perspective: 900px; }
@@ -429,8 +434,6 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
   .hero-photo { width: 150px; height: 150px; }
   .photo-img { width: 120px; height: 120px; top: 15px; left: 15px; }
   .photo-ring { top: 5px; left: 5px; right: 5px; bottom: 5px; }
-  .radar-label { font-size: .66rem; }
-  .radar-label .lang-en { font-size: .54rem; }
 }
 
 /* ---------- 文章页(blog) ---------- */

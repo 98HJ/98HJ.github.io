@@ -183,32 +183,31 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- Hero 研究兴趣雷达图:悬停高亮 + 点击定位 ---------- */
-  var radarLabels = document.querySelectorAll(".radar-label");
-  Array.prototype.forEach.call(radarLabels, function (label) {
-    var axis = label.getAttribute("data-axis");
-    var id = label.getAttribute("data-target");
-    function setActive(on) {
-      var dot = document.querySelector('.radar-dot[data-axis="' + axis + '"]');
-      var spoke = document.querySelector('.radar-spoke[data-axis="' + axis + '"]');
-      if (dot) dot.classList.toggle("is-active", on);
-      if (spoke) spoke.classList.toggle("is-active", on);
-      label.classList.toggle("active", on);
+  /* ---------- Hero 点赞按钮(本地存储,纯前端无需后端) ---------- */
+  var likeBtn = document.getElementById("likeBtn");
+  if (likeBtn) {
+    var likeCount = document.getElementById("likeCount");
+    var LIKE_KEY = "site-liked";
+    var LIKE_BASE = 128; // 展示用基数(非全局服务器统计;真实全局数见页脚访客统计)
+    function paintLiked(liked) {
+      likeBtn.classList.toggle("liked", liked);
+      likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
+      if (likeCount) likeCount.textContent = String(LIKE_BASE + (liked ? 1 : 0));
     }
-    label.addEventListener("mouseenter", function () { setActive(true); });
-    label.addEventListener("mouseleave", function () { setActive(false); });
-    label.addEventListener("focus", function () { setActive(true); });
-    label.addEventListener("blur", function () { setActive(false); });
-    label.addEventListener("click", function (e) {
-      var target = id && document.getElementById(id);
-      if (target) {
-        e.preventDefault();
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        target.classList.add("flash");
-        setTimeout(function () { target.classList.remove("flash"); }, 1400);
+    var stored = false;
+    try { stored = localStorage.getItem(LIKE_KEY) === "1"; } catch (e) {}
+    paintLiked(stored);
+    likeBtn.addEventListener("click", function () {
+      var liked = !likeBtn.classList.contains("liked");
+      try { localStorage.setItem(LIKE_KEY, liked ? "1" : "0"); } catch (e) {}
+      paintLiked(liked);
+      if (liked) {
+        likeBtn.classList.remove("pop");
+        void likeBtn.offsetWidth; // 重启动画
+        likeBtn.classList.add("pop");
       }
     });
-  });
+  }
 
   // 标记脚本已初始化(供子页面兜底脚本判断,避免渐显元素因脚本未加载而永久隐藏)
   window.__siteReady = true;
