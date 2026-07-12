@@ -193,6 +193,9 @@
   function capiGet(ns, key) {
     return fetch(COUNTAPI + "/get/" + ns + "/" + key).then(function (r) { return r.json(); });
   }
+  function capiUpdate(ns, key, value) {
+    return fetch(COUNTAPI + "/update/" + ns + "/" + key + "/" + encodeURIComponent(value)).then(function (r) { return r.json(); });
+  }
 
   // 点赞粒子迸发(纯 CSS 动画 + JS 生成,尊重 reduced-motion)
   function spawnParticles(btn) {
@@ -269,7 +272,7 @@
     }
     var thanks = document.createElement("div");
     thanks.className = "like-thanks";
-    thanks.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#e0533d" d="' + HEART + '"/></svg><span class="t-zh">感谢你的喜欢</span><span class="t-en">Thanks for the like</span>';
+    thanks.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#e0533d" d="' + HEART + '"/></svg><span class="t-zh">感谢您的小心心</span><span class="t-en">Thanks for the like</span>';
     document.body.appendChild(thanks);
     (function (node) {
       var rm = function () { if (node.parentNode) node.parentNode.removeChild(node); };
@@ -291,18 +294,44 @@
     capiGet(NS, "likes").then(function (d) {
       if (d && typeof d.value === "number" && likeCount) likeCount.textContent = String(d.value);
     }).catch(function () {});
-    likeBtn.addEventListener("click", function () {
-      if (liked) return; // 已点过:不重复计数
+    // 取消点赞失败时回滚本地状态,保持与全局计数一致
+    function revertLike() {
       liked = true;
       try { localStorage.setItem(LIKE_KEY, "1"); } catch (e) {}
       likeBtn.classList.add("liked");
       likeBtn.setAttribute("aria-pressed", "true");
+    }
+    likeBtn.addEventListener("click", function () {
+      liked = !liked; // 切换:点赞 <-> 取消
+      try { localStorage.setItem(LIKE_KEY, liked ? "1" : "0"); } catch (e) {}
+      likeBtn.classList.toggle("liked", liked);
+      likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
+      // 触觉反馈(点赞/取消都给一次回弹)
       likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
-      spawnParticles(likeBtn);
-      celebrateLike(likeBtn);
-      capiHit(NS, "likes").then(function (d) {
-        if (d && typeof d.value === "number" && likeCount) likeCount.textContent = String(d.value);
-      }).catch(function () {});
+
+      if (liked) {
+        // 点赞:全局 +1 + 动画 + 全屏庆祝
+        spawnParticles(likeBtn);
+        celebrateLike(likeBtn);
+        capiHit(NS, "likes").then(function (d) {
+          if (d && typeof d.value === "number" && likeCount) likeCount.textContent = String(d.value);
+        }).catch(function () {});
+      } else {
+        // 取消点赞:读当前全局值再 -1 写回(CountAPI 免令牌 /update,GET 无 CORS 预检)
+        capiGet(NS, "likes").then(function (d) {
+          var v = (d && typeof d.value === "number") ? d.value : 0;
+          if (v <= 0) { if (likeCount) likeCount.textContent = "0"; return; }
+          return capiUpdate(NS, "likes", v - 1);
+        }).then(function (d) {
+          if (d && typeof d.value === "number" && likeCount) {
+            likeCount.textContent = String(d.value);
+          } else if (d === undefined) {
+            // v<=0 分支,无需处理
+          } else {
+            revertLike(); // 更新未返回有效值 -> 回滚
+          }
+        }).catch(function () { revertLike(); });
+      }
     });
   }
 
