@@ -90,6 +90,10 @@ html[data-lang="en"] .lang-en { display: inline; }
   .photo-ring--spin { animation: none; }
   .photo-3d { transition: none; }
   .card, .blog-card { transform: none !important; }
+  .hero-orbit { height: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 30px 0 0; }
+  .orbit-core { position: static; transform: none; width: auto; height: auto; border: 0; box-shadow: none; background: none; color: var(--accent); flex-basis: 100%; align-items: flex-start; font-size: .8rem; }
+  .orbit-spin { position: static; animation: none !important; transform: none !important; }
+  .orbit-item { position: static; transform: none !important; animation: none !important; }
 }
 
 /* ---------- 顶部导航 ---------- */
@@ -182,11 +186,46 @@ html[data-lang="en"] .lang-en { display: inline; }
 
 .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
 
-/* ---------- hero 近况 / Now ---------- */
-.hero-now { list-style: none; margin: 30px 0 0; padding: 0; max-width: 560px; display: flex; flex-direction: column; gap: 12px; }
-.hero-now li { display: flex; align-items: baseline; gap: 14px; font-size: .9rem; line-height: 1.55; }
-.hero-now .now-label { flex: 0 0 56px; color: var(--accent); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; font-weight: 600; }
-.hero-now .now-text { color: var(--text); }
+/* ---------- hero 研究轨道动画 ---------- */
+.hero-orbit { position: relative; height: 232px; max-width: 560px; margin: 30px 0 0; }
+.orbit-core {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 92px; height: 92px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--card); border: 1px solid var(--line);
+  box-shadow: 0 10px 26px var(--shadow); color: var(--accent);
+  font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; z-index: 2;
+}
+.orbit-core .lang-zh { font-size: .82rem; letter-spacing: .08em; }
+.orbit-core .lang-en { font-size: .58rem; opacity: .7; margin-top: 3px; }
+.orbit-spin { position: absolute; inset: 0; transform-origin: center; }
+.orbit-1 { animation: orbit 22s linear infinite; }
+.orbit-2 { animation: orbit 22s linear infinite; animation-delay: -7.33s; }
+.orbit-3 { animation: orbit 22s linear infinite; animation-delay: -14.66s; }
+@keyframes orbit { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.orbit-item {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) translateX(118px);
+  display: inline-flex; flex-direction: column; align-items: center;
+  padding: 9px 15px; border-radius: 999px; text-decoration: none;
+  background: var(--card); border: 1px solid var(--line); color: var(--text);
+  font-size: .8rem; line-height: 1.2; white-space: nowrap;
+  box-shadow: 0 8px 22px var(--shadow);
+  animation: orbit-upright 22s linear infinite;
+  transition: border-color .25s, color .25s, box-shadow .25s;
+}
+.orbit-1 .orbit-item { animation-delay: 0s; }
+.orbit-2 .orbit-item { animation-delay: -7.33s; }
+.orbit-3 .orbit-item { animation-delay: -14.66s; }
+@keyframes orbit-upright {
+  from { transform: translate(-50%, -50%) translateX(118px) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) translateX(118px) rotate(-360deg); }
+}
+.orbit-item .lang-en { font-size: .62rem; color: var(--muted); margin-top: 1px; }
+.orbit-item:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 10px 26px var(--shadow); }
+.hero-orbit:hover .orbit-spin,
+.hero-orbit:hover .orbit-item { animation-play-state: paused; }
+.card.flash { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(168, 90, 60, .25), 0 18px 40px var(--shadow); }
 
 .hero-photo { position: relative; justify-self: end; width: 260px; height: 260px; perspective: 900px; }
 .photo-3d { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform .25s ease-out; will-change: transform; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); }
@@ -411,8 +450,12 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
   .hero-photo { width: 150px; height: 150px; }
   .photo-img { width: 120px; height: 120px; top: 15px; left: 15px; }
   .photo-ring { top: 5px; left: 5px; right: 5px; bottom: 5px; }
-  .hero-now { gap: 10px; }
-  .hero-now .now-label { flex-basis: 52px; }
+  .hero-orbit { height: 200px; }
+  .orbit-item { transform: translate(-50%, -50%) translateX(96px); font-size: .74rem; padding: 8px 12px; }
+  @keyframes orbit-upright {
+    from { transform: translate(-50%, -50%) translateX(96px) rotate(0deg); }
+    to   { transform: translate(-50%, -50%) translateX(96px) rotate(-360deg); }
+  }
 }
 
 /* ---------- 文章页(blog) ---------- */

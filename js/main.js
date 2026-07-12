@@ -183,6 +183,21 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
+  /* ---------- Hero 研究轨道:点击定位到对应研究卡片 ---------- */
+  var orbitItems = document.querySelectorAll(".orbit-item");
+  Array.prototype.forEach.call(orbitItems, function (item) {
+    item.addEventListener("click", function (e) {
+      var id = item.getAttribute("data-target");
+      var target = id && document.getElementById(id);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        target.classList.add("flash");
+        setTimeout(function () { target.classList.remove("flash"); }, 1400);
+      }
+    });
+  });
+
   // 标记脚本已初始化(供子页面兜底脚本判断,避免渐显元素因脚本未加载而永久隐藏)
   window.__siteReady = true;
 })();
