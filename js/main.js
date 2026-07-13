@@ -191,7 +191,7 @@
    * 未填写或不可达时,自动降级为 localStorage 本地模式(刷新不丢,但不跨设备共享)。
    * 国内访问 Cloudflare 偶发被限速,但免费且免实名;绑定自定义域名可进一步提速。
    */
-  var COUNTER_API = "____FILL_COUNTER_API____"; // ← 替换为你的 Cloudflare Worker URL(作为 /counter 接口的 base)
+  var COUNTER_API = "https://98hj-counter.jhua1014.workers.dev"; // ← 替换为你的 Cloudflare Worker URL(作为 /counter 接口的 base)
   var COUNTER_READY = COUNTER_API.indexOf("____") !== 0 && COUNTER_API.length > 8;
 
   function counterHeaders() { return { "Content-Type": "application/json" }; }
