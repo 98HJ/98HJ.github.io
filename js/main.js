@@ -183,34 +183,17 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- 全局统计(Cloudflare Workers + KV · 免实名 · 永久免费) ---------- */
-  /*
-   * 真值源:Cloudflare Worker(读写 KV 命名空间),跨所有访客共享点赞/PV/UV;兜底:localStorage。
-   * 用户在 Cloudflare 建 Worker + KV 后,把 Worker 的 URL 填到 COUNTER_API(形如 https://<名>.<子域>.workers.dev)。
-   * 接口约定: GET/POST {COUNTER_API}/counter?key=KEY[&delta=N] 返回 {"value":数字}
-   * 未填写或不可达时,自动降级为 localStorage 本地模式(刷新不丢,但不跨设备共享)。
-   * 国内访问 Cloudflare 偶发被限速,但免费且免实名;绑定自定义域名可进一步提速。
+  /* ---------- 访客统计(PV / UV 全局)----------
+   * 采用不蒜子(busuanzi):纯前端、国内可访问、免费、免实名,自动统计全站 PV / UV。
+   * 注意:不蒜子按域名计数 —— github.io 与 CloudStudio 预览为两个独立站点,各自累计。
+   * 点赞为本地 localStorage 持久化(见下方),各浏览器 / 设备独立,刷新不丢。
    */
-  var COUNTER_API = "https://98hj-counter.jhua1014.workers.dev"; // ← 替换为你的 Cloudflare Worker URL(作为 /counter 接口的 base)
-  var COUNTER_READY = COUNTER_API.indexOf("____") !== 0 && COUNTER_API.length > 8;
-
-  function counterHeaders() { return { "Content-Type": "application/json" }; }
-  function counterReady() { return COUNTER_READY; }
-  // 读取当前值
-  function counterGet(key) {
-    if (!counterReady()) return Promise.reject("no-counter");
-    return fetch(COUNTER_API + "/counter?key=" + encodeURIComponent(key), { headers: counterHeaders() })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { if (typeof d.value !== "number") throw new Error("bad"); return d.value; });
-  }
-  // 增减(后端处理),返回新值
-  function counterIncr(key, delta) {
-    if (!counterReady()) return Promise.reject("no-counter");
-    return fetch(COUNTER_API + "/counter?key=" + encodeURIComponent(key) + "&delta=" + encodeURIComponent(delta),
-      { method: "POST", headers: counterHeaders() })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { if (typeof d.value !== "number") throw new Error("bad"); return d.value; });
-  }
+  (function () {
+    var s = document.createElement("script");
+    s.async = true;
+    s.src = "https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js";
+    document.head.appendChild(s);
+  })();
 
   // ====== 点赞粒子迸发 ======
   function spawnParticles(btn) {
@@ -296,15 +279,14 @@
     })(thanks);
   }
 
-  // ====== 点赞(本地 localStorage 持久化,刷新不丢;Cloudflare 可选全局同步) ======
+  // ====== 点赞(本地 localStorage 持久化,刷新不丢;各浏览器 / 设备独立) ======
   var likeBtn = document.getElementById("likeBtn");
   var likeCount = document.getElementById("likeCount");
   if (likeBtn) {
-    var LIKE_KEY = "site-liked";       // 本浏览器是否已赞
+    var LIKE_KEY = "site-liked";        // 本浏览器是否已赞
     var LIKES_KEY = "site-likes-count"; // 本地持久化点赞数(刷新后恢复)
     var liked = false;
     try { liked = localStorage.getItem(LIKE_KEY) === "1"; } catch (e) {}
-    // 从 localStorage 读取持久化的点赞数(默认 0)
     var localLikes = 0;
     try { var lv = parseInt(localStorage.getItem(LIKES_KEY), 10); if (!isNaN(lv) && lv >= 0) localLikes = lv; } catch (e) {}
     function renderLikes(v) { if (likeCount) likeCount.textContent = String(v); }
@@ -313,21 +295,6 @@
     likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
     renderLikes(localLikes);
 
-    // 后台用全局值覆盖本地(未配置/不可达时跳过,保留本地值)
-    if (counterReady()) {
-      counterGet("likes").then(function (v) {
-        if (typeof v === "number" && v >= 0) { localLikes = v; saveLikes(); renderLikes(v); }
-      }).catch(function () {});
-    }
-
-    // 取消写入全局失败时的回滚(恢复本地已赞状态与计数)
-    function revertLike() {
-      liked = true;
-      try { localStorage.setItem(LIKE_KEY, "1"); } catch (e) {}
-      likeBtn.classList.add("liked");
-      likeBtn.setAttribute("aria-pressed", "true");
-      localLikes = Math.max(0, localLikes + 1); renderLikes(localLikes); saveLikes();
-    }
     likeBtn.addEventListener("click", function () {
       liked = !liked;
       try { localStorage.setItem(LIKE_KEY, liked ? "1" : "0"); } catch (e) {}
@@ -336,56 +303,16 @@
       likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
 
       if (liked) {
-        // 本地立即 +1 并持久化(刷新不丢),同时全局 +1
         localLikes += 1; renderLikes(localLikes); saveLikes();
         spawnParticles(likeBtn);
         celebrateLike(likeBtn);
-        if (counterReady()) {
-          counterIncr("likes", 1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); }).catch(function () {});
-        }
       } else {
-        // 取消:本地立即 -1 并持久化
         localLikes = Math.max(0, localLikes - 1); renderLikes(localLikes); saveLikes();
-        // 后台全局 -1(仅计数器启用;失败回滚本地状态)
-        if (counterReady()) {
-          counterIncr("likes", -1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); })
-            .catch(function () { revertLike(); });
-        }
       }
     });
   }
 
-  // ====== 访客统计(PV 每次访问+1 / UV 首次访问+1;Cloudflare 全局同步 + localStorage 兜底) ======
-  var uvEl = document.getElementById("siteUv");
-  var pvEl = document.getElementById("sitePv");
-
-  // PV:本地先 +1 兜底展示,同时全局 +1 并覆盖为真实全局值
-  var LOCAL_PV_KEY = "site-pv-local";
-  if (pvEl) {
-    var localPv = 0;
-    try { var pv = parseInt(localStorage.getItem(LOCAL_PV_KEY), 10); if (!isNaN(pv) && pv >= 0) localPv = pv; } catch (e) {}
-    localPv += 1;
-    try { localStorage.setItem(LOCAL_PV_KEY, String(localPv)); } catch (e) {}
-    pvEl.textContent = String(localPv);
-    if (counterReady()) {
-      counterIncr("site-pv", 1).then(function (v) { pvEl.textContent = String(v); }).catch(function () {});
-    }
-  }
-
-  // UV:本机首次访问时全局 +1;老访客只读全局值。本机兜底显示至少 1
-  if (uvEl) {
-    var uvSeen = false;
-    try { uvSeen = localStorage.getItem("site-uv-seen") === "1"; } catch (e) {}
-    uvEl.textContent = "1";
-    if (counterReady()) {
-      if (!uvSeen) {
-        counterIncr("site-uv", 1).then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
-        try { localStorage.setItem("site-uv-seen", "1"); } catch (e) {}
-      } else {
-        counterGet("site-uv").then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
-      }
-    }
-  }
+  // 访客 PV / UV 已由不蒜子(busuanzi)自动统计并填充 #busuanzi_value_site_pv / #busuanzi_value_site_uv,此处无需额外逻辑。
 
   // Giscus 评论区跟随站点深 / 浅主题
   function syncGiscusTheme(theme) {
