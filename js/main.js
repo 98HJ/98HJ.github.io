@@ -239,7 +239,7 @@
   }
 
   // 点赞全屏庆祝(心形升起铺满视口 + 居中致谢卡片;尊重 reduced-motion)
-  function celebrateLike(btn) {
+  function celebrateLike(btn, showThanks) {
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var layer = document.querySelector(".like-celebrate");
     if (!layer) {
@@ -247,6 +247,9 @@
       layer.className = "like-celebrate";
       document.body.appendChild(layer);
     }
+    // 限制同时存在的庆祝心形数量,避免快速连点导致 DOM 堆叠卡顿
+    var existing = layer ? layer.querySelectorAll(".celebrate-heart").length : 0;
+    if (existing >= 48) return;
     var rect = btn ? btn.getBoundingClientRect() : null;
     var ox = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
     var oy = rect ? rect.top + rect.height / 2 : window.innerHeight * 0.6;
@@ -281,15 +284,17 @@
         setTimeout(rm, 3600);
       })(h);
     }
-    var thanks = document.createElement("div");
-    thanks.className = "like-thanks";
-    thanks.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#e0533d" d="' + HEART + '"/></svg><span class="t-zh">感谢您的小心心</span><span class="t-en">Thanks for the like</span>';
-    document.body.appendChild(thanks);
-    (function (node) {
-      var rm = function () { if (node.parentNode) node.parentNode.removeChild(node); };
-      node.addEventListener("animationend", rm);
-      setTimeout(rm, 2300);
-    })(thanks);
+    if (showThanks) {
+      var thanks = document.createElement("div");
+      thanks.className = "like-thanks";
+      thanks.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#e0533d" d="' + HEART + '"/></svg><span class="t-zh">感谢您的小心心</span><span class="t-en">Thanks for the like</span>';
+      document.body.appendChild(thanks);
+      (function (node) {
+        var rm = function () { if (node.parentNode) node.parentNode.removeChild(node); };
+        node.addEventListener("animationend", rm);
+        setTimeout(rm, 2300);
+      })(thanks);
+    }
   }
 
   // ====== 点赞(连续点赞 / 鼓掌式:每次点击 +1,全局同步 + 本地兜底) ======
@@ -317,12 +322,10 @@
       localLikes += 1; renderLikes(localLikes); saveLikes();
       likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
       spawnParticles(likeBtn);
-      // 本次访问首次点赞放全屏庆祝,之后只做轻量动画,避免每次都满屏
-      if (!celebrated) {
-        celebrateLike(likeBtn);
-        celebrated = true;
-        try { sessionStorage.setItem("like-celebrated", "1"); } catch (e) {}
-      }
+      // 每次点击都放全屏心形升起(全局特效);致谢卡片仅首次,避免连点刷屏
+      celebrateLike(likeBtn, !celebrated);
+      celebrated = true;
+      try { sessionStorage.setItem("like-celebrated", "1"); } catch (e) {}
       // 全局 +1(失败保留本地乐观值)
       if (counterReady()) {
         counterIncr("likes", 1).then(function (v) { if (typeof v === "number" && v >= 0) { localLikes = Math.max(localLikes, v); saveLikes(); renderLikes(localLikes); } }).catch(function () {});
