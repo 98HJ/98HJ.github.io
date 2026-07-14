@@ -292,20 +292,19 @@
     })(thanks);
   }
 
-  // ====== 点赞(本地 localStorage 持久化 + 腾讯云 SCF 全局同步) ======
+  // ====== 点赞(连续点赞 / 鼓掌式:每次点击 +1,全局同步 + 本地兜底) ======
   var likeBtn = document.getElementById("likeBtn");
   var likeCount = document.getElementById("likeCount");
   if (likeBtn) {
-    var LIKE_KEY = "site-liked";        // 本浏览器是否已赞
-    var LIKES_KEY = "site-likes-count"; // 本地持久化点赞数(刷新后恢复)
-    var liked = false;
-    try { liked = localStorage.getItem(LIKE_KEY) === "1"; } catch (e) {}
+    var LIKES_KEY = "site-likes-count"; // 全局点赞总数的最后已知值(刷新 / 离线兜底)
     var localLikes = 0;
     try { var lv = parseInt(localStorage.getItem(LIKES_KEY), 10); if (!isNaN(lv) && lv >= 0) localLikes = lv; } catch (e) {}
+    var celebrated = false;            // 本次访问仅首次点赞放全屏庆祝
+    try { celebrated = sessionStorage.getItem("like-celebrated") === "1"; } catch (e) {}
+
     function renderLikes(v) { if (likeCount) likeCount.textContent = String(v); }
     function saveLikes() { try { localStorage.setItem(LIKES_KEY, String(localLikes)); } catch (e) {} }
-    likeBtn.classList.toggle("liked", liked);
-    likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
+    likeBtn.setAttribute("aria-pressed", "true");
     renderLikes(localLikes);
 
     // 后台用全局值覆盖本地(不可达时保留本地值)
@@ -313,33 +312,20 @@
       counterGet("likes").then(function (v) { if (typeof v === "number" && v >= 0) { localLikes = v; saveLikes(); renderLikes(v); } }).catch(function () {});
     }
 
-    // 取消写入全局失败时的回滚(恢复本地已赞状态与计数)
-    function revertLike() {
-      liked = true;
-      try { localStorage.setItem(LIKE_KEY, "1"); } catch (e) {}
-      likeBtn.classList.add("liked");
-      likeBtn.setAttribute("aria-pressed", "true");
-      localLikes = Math.max(0, localLikes + 1); renderLikes(localLikes); saveLikes();
-    }
     likeBtn.addEventListener("click", function () {
-      liked = !liked;
-      try { localStorage.setItem(LIKE_KEY, liked ? "1" : "0"); } catch (e) {}
-      likeBtn.classList.toggle("liked", liked);
-      likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
+      // 乐观更新:本地立即 +1,动画照播,无需先取消
+      localLikes += 1; renderLikes(localLikes); saveLikes();
       likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
-
-      if (liked) {
-        localLikes += 1; renderLikes(localLikes); saveLikes();
-        spawnParticles(likeBtn);
+      spawnParticles(likeBtn);
+      // 本次访问首次点赞放全屏庆祝,之后只做轻量动画,避免每次都满屏
+      if (!celebrated) {
         celebrateLike(likeBtn);
-        if (counterReady()) {
-          counterIncr("likes", 1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); }).catch(function () {});
-        }
-      } else {
-        localLikes = Math.max(0, localLikes - 1); renderLikes(localLikes); saveLikes();
-        if (counterReady()) {
-          counterIncr("likes", -1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); }).catch(function () { revertLike(); });
-        }
+        celebrated = true;
+        try { sessionStorage.setItem("like-celebrated", "1"); } catch (e) {}
+      }
+      // 全局 +1(失败保留本地乐观值)
+      if (counterReady()) {
+        counterIncr("likes", 1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); }).catch(function () {});
       }
     });
   }

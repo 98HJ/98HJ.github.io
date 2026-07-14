@@ -185,8 +185,7 @@ html[data-lang="en"] .lang-en { display: inline; }
 
 .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
 
-/* ---------- hero 社交互动(点赞) ---------- */
-.hero-social { margin: 34px 0 0; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+/* ---------- 点赞悬浮按钮(左下角固定) ---------- */
 .like-btn {
   position: relative;
   display: inline-flex; align-items: center; gap: 10px; cursor: pointer;
@@ -249,7 +248,31 @@ html[data-lang="en"] .lang-en { display: inline; }
   40% { transform: translateY(-4px) scale(1.18); }
   100% { transform: translateY(0); }
 }
-.like-hint { font-size: .82rem; color: var(--muted); margin: 0; }
+/* 左下角悬浮形态:圆形、强调色、带数字角标 */
+.like-fab {
+  position: fixed; left: 22px; bottom: 22px; z-index: 61;
+  width: 56px; height: 56px; padding: 0; border: none; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  box-shadow: 0 10px 26px rgba(168,90,60,.45);
+}
+.like-fab:hover { border-color: transparent; transform: translateY(-2px) scale(1.05); box-shadow: 0 14px 32px rgba(168,90,60,.55); }
+.like-fab:active { transform: scale(.92); }
+.like-fab:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.like-fab .like-heart { width: 24px; height: 24px; }
+.like-fab .like-heart-svg { fill: #fff; stroke: #fff; }
+.like-fab.pop .like-heart svg { animation: like-bounce .5s cubic-bezier(.3,1.4,.5,1); }
+.like-fab.pop .like-heart::after { border-color: rgba(255,255,255,.9); animation: like-ring .55s ease-out; }
+.like-fab .like-count {
+  position: absolute; top: -6px; right: -6px;
+  min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px;
+  background: #fff; color: var(--accent); border: 2px solid var(--accent);
+  font-size: .72rem; font-weight: 700; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+}
+.like-fab.pop .like-count { animation: count-pop .4s ease; }
+@media (max-width: 600px) {
+  .like-fab { left: 16px; bottom: 16px; width: 52px; height: 52px; }
+}
 
 /* 点赞全屏庆祝(心形升起铺满视口 + 居中致谢卡片) */
 .like-celebrate { position: fixed; inset: 0; pointer-events: none; z-index: 90; overflow: hidden; }
