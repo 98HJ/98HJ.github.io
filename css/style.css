@@ -49,7 +49,7 @@ body {
   color: var(--ink);
   background: var(--bg);
   line-height: 1.8;
-  font-weight: 400;
+  font-weight: 300;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   font-feature-settings: "kern" 1;
@@ -387,7 +387,7 @@ html[data-lang="en"] .lang-en { display: inline; }
 section[id] { scroll-margin-top: 84px; }
 .section-alt { background: linear-gradient(180deg, var(--bg) 0%, var(--bg-alt) 100%); border-top: 1px solid var(--line); }
 .section-title {
-  font-family: var(--serif-cjk); font-size: 1.85rem; font-weight: 700;
+  font-family: var(--serif-cjk); font-size: 1.85rem; font-weight: 600;
   margin: 0 0 32px; position: relative; padding-bottom: 14px;
 }
 .section-title::after {
@@ -421,7 +421,7 @@ code { background: var(--accent-soft); padding: 2px 7px; border-radius: 5px; fon
 /* 倾斜时内容分层浮起(景深),非精细指针/静态时自动坍缩为平面 */
 .card.tilt-on { transform-style: preserve-3d; }
 .card-num { font-family: var(--serif); font-style: italic; font-size: 1.4rem; color: var(--accent); opacity: .55; transition: transform .25s ease; }
-.card h3 { font-family: var(--serif-cjk); font-size: 1.2rem; margin: 6px 0 8px; font-weight: 600; transition: transform .25s ease; }
+.card h3 { font-family: var(--serif-cjk); font-size: 1.2rem; margin: 6px 0 8px; font-weight: 500; transition: transform .25s ease; }
 .card p { margin: 0; color: var(--muted); font-size: .92rem; }
 .card.tilt-on .card-num { transform: translateZ(34px); }
 .card.tilt-on h3 { transform: translateZ(20px); }
