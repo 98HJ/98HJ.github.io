@@ -53,7 +53,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="css/style.css?v=20260713" />
+  <link rel="stylesheet" href="css/style.css?v=20260715" />
 </head>
 <body>
 
@@ -352,7 +352,6 @@
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 
-  <script src="js/main.js?v=20260713"></script>
   <!-- 访客统计 + 点赞:腾讯云 SCF 函数 URL(国内可达 / 全局同步 · 见 js/main.js) -->
   <script>
     // Fallback (unconditional): reveal all .reveal elements on load so the page is never blank,
@@ -371,5 +370,8 @@
     </span>
     <span class="like-count" id="likeCount">0</span>
   </button>
+
+  <!-- 主脚本置于点赞按钮之后:确保 DOM 解析完成后再执行,点赞点击监听才能正确绑定 -->
+  <script src="js/main.js?v=20260715"></script>
 </body>
 </html>

@@ -253,6 +253,7 @@ html[data-lang="en"] .lang-en { display: inline; }
   position: fixed; left: 22px; bottom: 22px; z-index: 61;
   width: 56px; height: 56px; padding: 0; border: none; border-radius: 50%;
   background: var(--accent); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
   box-shadow: 0 10px 26px rgba(168,90,60,.45);
 }
 .like-fab:hover { border-color: transparent; transform: translateY(-2px) scale(1.05); box-shadow: 0 14px 32px rgba(168,90,60,.55); }
@@ -304,6 +305,9 @@ html[data-lang="en"] .lang-en { display: inline; }
 .visitor { margin-top: 14px; font-size: .8rem; color: var(--muted); }
 .visitor .lang-en { margin-left: 2px; }
 .visitor #siteUv, .visitor #sitePv { color: var(--accent); font-weight: 600; }
+
+/* 主页左下角有点赞悬浮钮(56px),给页脚留足底部空间,避免悬浮钮压住访客统计文字 */
+.site-footer { padding-bottom: 96px; }
 
 /* ---------- 笔记评论区(Giscus) ---------- */
 .comments { padding: 52px 0 8px; }
