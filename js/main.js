@@ -309,7 +309,7 @@
 
     // 后台用全局值覆盖本地(不可达时保留本地值)
     if (counterReady()) {
-      counterGet("likes").then(function (v) { if (typeof v === "number" && v >= 0) { localLikes = v; saveLikes(); renderLikes(v); } }).catch(function () {});
+      counterGet("likes").then(function (v) { if (typeof v === "number" && v >= 0) { localLikes = Math.max(localLikes, v); saveLikes(); renderLikes(localLikes); } }).catch(function () {});
     }
 
     likeBtn.addEventListener("click", function () {
@@ -325,7 +325,7 @@
       }
       // 全局 +1(失败保留本地乐观值)
       if (counterReady()) {
-        counterIncr("likes", 1).then(function (v) { localLikes = v; saveLikes(); renderLikes(v); }).catch(function () {});
+        counterIncr("likes", 1).then(function (v) { if (typeof v === "number" && v >= 0) { localLikes = Math.max(localLikes, v); saveLikes(); renderLikes(localLikes); } }).catch(function () {});
       }
     });
   }
@@ -343,7 +343,7 @@
     try { localStorage.setItem(LOCAL_PV_KEY, String(localPv)); } catch (e) {}
     pvEl.textContent = String(localPv);
     if (counterReady()) {
-      counterIncr("site-pv", 1).then(function (v) { pvEl.textContent = String(v); }).catch(function () {});
+      counterIncr("site-pv", 1).then(function (v) { if (typeof v === "number" && v >= 0) pvEl.textContent = String(Math.max(localPv, v)); }).catch(function () {});
     }
   }
 
@@ -354,10 +354,10 @@
     uvEl.textContent = "1";
     if (counterReady()) {
       if (!uvSeen) {
-        counterIncr("site-uv", 1).then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
+        counterIncr("site-uv", 1).then(function (v) { if (typeof v === "number" && v >= 0) uvEl.textContent = String(Math.max(1, v)); }).catch(function () {});
         try { localStorage.setItem("site-uv-seen", "1"); } catch (e) {}
       } else {
-        counterGet("site-uv").then(function (v) { uvEl.textContent = String(v); }).catch(function () {});
+        counterGet("site-uv").then(function (v) { if (typeof v === "number" && v >= 0) uvEl.textContent = String(Math.max(1, v)); }).catch(function () {});
       }
     }
   }
