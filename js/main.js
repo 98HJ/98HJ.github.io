@@ -280,8 +280,8 @@
   var likeBtn = document.getElementById("likeBtn");
   if (likeBtn) {
     var LIKED_KEY = "site-liked";
+    // 初始一律白心(未赞),不读取历史 localStorage,避免旧记录导致「一打开就是红心、要先取消」的困惑
     var liked = false;
-    try { liked = localStorage.getItem(LIKED_KEY) === "1"; } catch (e) {}
 
     function paint() {
       likeBtn.classList.toggle("liked", liked);
