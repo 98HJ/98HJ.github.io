@@ -279,6 +279,9 @@ html[data-lang="en"] .lang-en { display: inline; }
 .like-fab:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .like-fab .like-heart { width: 24px; height: 24px; }
 .like-fab .like-heart-svg { fill: #fff; stroke: #fff; }
+/* 已赞态:背景转白 + 心形转赤陶,保证在悬浮按钮上始终清晰可见(避免赤陶心形融入赤陶背景) */
+.like-fab.liked { background: #fff; box-shadow: 0 10px 26px rgba(168,90,60,.35); }
+.like-fab.liked .like-heart-svg { fill: var(--accent); stroke: var(--accent); }
 .like-fab.pop .like-heart svg { animation: like-bounce .5s cubic-bezier(.3,1.4,.5,1); }
 .like-fab.pop .like-heart::after { border-color: rgba(255,255,255,.9); animation: like-ring .55s ease-out; }
 @media (max-width: 600px) {

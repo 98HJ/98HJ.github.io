@@ -262,6 +262,8 @@
       })(h);
     }
     if (showThanks) {
+      var old = document.querySelector(".like-thanks");
+      if (old && old.parentNode) old.parentNode.removeChild(old);
       var thanks = document.createElement("div");
       thanks.className = "like-thanks";
       thanks.innerHTML = '<svg viewBox="0 0 24 24"><path fill="#e0533d" d="' + HEART + '"/></svg><span class="t-zh">感谢您的小心心</span><span class="t-en">Thanks for the like</span>';
@@ -280,8 +282,6 @@
     var LIKED_KEY = "site-liked";
     var liked = false;
     try { liked = localStorage.getItem(LIKED_KEY) === "1"; } catch (e) {}
-    var celebrated = false;            // 本次访问仅首次点赞放全屏庆祝
-    try { celebrated = sessionStorage.getItem("like-celebrated") === "1"; } catch (e) {}
 
     function paint() {
       likeBtn.classList.toggle("liked", liked);
@@ -296,10 +296,8 @@
       likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
       if (liked) {
         spawnParticles(likeBtn);
-        // 全屏心形升起(全局特效);致谢卡片仅首次,避免连点刷屏
-        celebrateLike(likeBtn, !celebrated);
-        celebrated = true;
-        try { sessionStorage.setItem("like-celebrated", "1"); } catch (e) {}
+        // 全屏心形升起 + 致谢卡片(每次点赞都给反馈,卡片单实例防堆叠)
+        celebrateLike(likeBtn, true);
       }
     });
   }
