@@ -352,13 +352,6 @@
           <span class="sr-only">Email</span>
         </a>
       </nav>
-      <div class="visitor">
-        <span class="lang-zh">访客</span><span class="lang-en">Visitors</span>:
-        <span id="siteUv">—</span> UV
-        · <span class="lang-zh">浏览量</span><span class="lang-en">Views</span>:
-        <span id="sitePv">—</span> PV
-      </div>
-      </nav>
     </div>
   </footer>
 
@@ -366,7 +359,7 @@
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 
-  <!-- 访客统计 + 点赞:腾讯云 SCF 函数 URL(国内可达 / 全局同步 · 见 js/main.js) -->
+  <!-- 点赞:纯点赞功能(无计数),逻辑见 js/main.js -->
   <script>
     // Fallback (unconditional): reveal all .reveal elements on load so the page is never blank,
     // even if main.js fails to load or initialize.
@@ -375,17 +368,16 @@
     });
   </script>
 
-  <!-- 点赞悬浮按钮(左下角固定 · 连续点赞) -->
+  <!-- 点赞悬浮按钮(左下角固定 · 纯点赞) -->
   <button type="button" class="like-btn like-fab" id="likeBtn" aria-pressed="true" aria-label="点赞 / Like">
     <span class="like-heart" aria-hidden="true">
       <svg class="like-heart-svg" viewBox="0 0 24 24" width="24" height="24" focusable="false">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
       </svg>
     </span>
-    <span class="like-count" id="likeCount">0</span>
   </button>
 
   <!-- 主脚本置于点赞按钮之后:确保 DOM 解析完成后再执行,点赞点击监听才能正确绑定 -->
-  <script src="js/main.js?v=20260715b"></script>
+  <script src="js/main.js?v=20260715e"></script>
 </body>
 </html>

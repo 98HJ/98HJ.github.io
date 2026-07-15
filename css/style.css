@@ -106,7 +106,6 @@ html[data-lang="en"] .lang-en { display: inline; }
   .card, .blog-card { transform: none !important; }
   .like-btn.pop .like-heart svg { animation: none; }
   .like-btn.pop .like-heart::after { animation: none; }
-  .like-btn.pop .like-count { animation: none; }
 }
 
 /* ---------- 顶部导航 ---------- */
@@ -262,8 +261,6 @@ html[data-lang="en"] .lang-en { display: inline; }
   100% { transform: translate(calc(-50% + var(--bx)), calc(-50% + var(--by))) scale(1); opacity: 0; }
 }
 
-.like-count { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--accent); }
-.like-btn.pop .like-count { animation: count-pop .4s ease; }
 @keyframes count-pop {
   0% { transform: translateY(0); }
   40% { transform: translateY(-4px) scale(1.18); }
@@ -284,14 +281,6 @@ html[data-lang="en"] .lang-en { display: inline; }
 .like-fab .like-heart-svg { fill: #fff; stroke: #fff; }
 .like-fab.pop .like-heart svg { animation: like-bounce .5s cubic-bezier(.3,1.4,.5,1); }
 .like-fab.pop .like-heart::after { border-color: rgba(255,255,255,.9); animation: like-ring .55s ease-out; }
-.like-fab .like-count {
-  position: absolute; top: -6px; right: -6px;
-  min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px;
-  background: #fff; color: var(--accent); border: 2px solid var(--accent);
-  font-size: .72rem; font-weight: 700; line-height: 1;
-  display: flex; align-items: center; justify-content: center;
-}
-.like-fab.pop .like-count { animation: count-pop .4s ease; }
 @media (max-width: 600px) {
   .like-fab { left: 16px; bottom: 16px; width: 52px; height: 52px; }
 }
@@ -323,9 +312,6 @@ html[data-lang="en"] .lang-en { display: inline; }
 }
 
 /* ---------- 页脚访客统计 ---------- */
-.visitor { margin-top: 14px; font-size: .8rem; color: var(--muted); }
-.visitor .lang-en { margin-left: 2px; }
-.visitor #siteUv, .visitor #sitePv { color: var(--accent); font-weight: 600; }
 
 /* 主页左下角有点赞悬浮钮(56px),给页脚留足底部空间,避免悬浮钮压住访客统计文字 */
 .site-footer { padding-bottom: 96px; }

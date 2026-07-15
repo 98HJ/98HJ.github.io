@@ -183,30 +183,7 @@
   enableTilt(".card", 7);
   enableTilt(".blog-card", 6);
 
-  /* ---------- 全局计数(腾讯云 SCF 函数 URL · 免 API 网关 · 国内可达) ----------
-   * 后端:腾讯云函数 URL(Python SCF,计数存于实例 /tmp)。接口约定:
-   *   GET/POST {COUNTER_API}?key=KEY[&delta=N]  → 返回 {"value":数字}
-   * 真值源在 SCF;localStorage 仅作离线 / 不可达兜底(刷新不丢)。
-   * 注意:函数 URL 控制台需开启 CORS(Allow-Origin *),否则浏览器跨域请求被拦。
-   * 局限:/tmp 非持久,实例冷启动 / 多实例会重置计数 —— 如需持久可改 COS 存储版。
-   */
-  var COUNTER_API = "https://1326811980-f08m7fu586.ap-shanghai.tencentscf.com";
-  var COUNTER_READY = COUNTER_API.indexOf("____") !== 0 && COUNTER_API.length > 8;
-
-  function counterReady() { return COUNTER_READY; }
-  function counterGet(key) {
-    if (!counterReady()) return Promise.reject("no-counter");
-    return fetch(COUNTER_API + "?key=" + encodeURIComponent(key), { method: "GET", cache: "no-store" })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { if (!d || typeof d.value !== "number") throw new Error("bad"); return d.value; });
-  }
-  function counterIncr(key, delta) {
-    if (!counterReady()) return Promise.reject("no-counter");
-    return fetch(COUNTER_API + "?key=" + encodeURIComponent(key) + "&delta=" + encodeURIComponent(delta),
-      { method: "POST", cache: "no-store" })
-      .then(function (r) { return r.json(); })
-      .then(function (d) { if (!d || typeof d.value !== "number") throw new Error("bad"); return d.value; });
-  }
+  /* 访客统计已取消(腾讯云欠费停服);点赞改为纯点赞,不再调用任何云端计数接口 */
 
   // ====== 点赞粒子迸发 ======
   function spawnParticles(btn) {
@@ -297,73 +274,37 @@
     }
   }
 
-  // ====== 点赞(连续点赞 / 鼓掌式:每次点击 +1,全局同步 + 本地兜底) ======
+  // ====== 点赞(纯点赞:心形填充 / 弹跳 / 粒子 / 庆祝,无计数;本地记录是否已赞) ======
   var likeBtn = document.getElementById("likeBtn");
-  var likeCount = document.getElementById("likeCount");
   if (likeBtn) {
-    var LIKES_KEY = "site-likes-count"; // 全局点赞总数的最后已知值(刷新 / 离线兜底)
-    var localLikes = 0;
-    try { var lv = parseInt(localStorage.getItem(LIKES_KEY), 10); if (!isNaN(lv) && lv >= 0) localLikes = lv; } catch (e) {}
+    var LIKED_KEY = "site-liked";
+    var liked = false;
+    try { liked = localStorage.getItem(LIKED_KEY) === "1"; } catch (e) {}
     var celebrated = false;            // 本次访问仅首次点赞放全屏庆祝
     try { celebrated = sessionStorage.getItem("like-celebrated") === "1"; } catch (e) {}
 
-    function renderLikes(v) { if (likeCount) likeCount.textContent = String(v); }
-    function saveLikes() { try { localStorage.setItem(LIKES_KEY, String(localLikes)); } catch (e) {} }
-    likeBtn.setAttribute("aria-pressed", "true");
-    renderLikes(localLikes);
-
-    // 后台用全局值覆盖本地(不可达时保留本地值)
-    if (counterReady()) {
-      counterGet("likes").then(function (v) { if (typeof v === "number" && v >= 0) { localLikes = Math.max(localLikes, v); saveLikes(); renderLikes(localLikes); } }).catch(function () {});
+    function paint() {
+      likeBtn.classList.toggle("liked", liked);
+      likeBtn.setAttribute("aria-pressed", liked ? "true" : "false");
     }
+    paint();
 
     likeBtn.addEventListener("click", function () {
-      // 乐观更新:本地立即 +1,动画照播,无需先取消
-      localLikes += 1; renderLikes(localLikes); saveLikes();
+      liked = !liked;
+      try { localStorage.setItem(LIKED_KEY, liked ? "1" : "0"); } catch (e) {}
+      paint();
       likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
-      spawnParticles(likeBtn);
-      // 每次点击都放全屏心形升起(全局特效);致谢卡片仅首次,避免连点刷屏
-      celebrateLike(likeBtn, !celebrated);
-      celebrated = true;
-      try { sessionStorage.setItem("like-celebrated", "1"); } catch (e) {}
-      // 全局 +1(失败保留本地乐观值)
-      if (counterReady()) {
-        counterIncr("likes", 1).then(function (v) { if (typeof v === "number" && v >= 0) { localLikes = Math.max(localLikes, v); saveLikes(); renderLikes(localLikes); } }).catch(function () {});
+      if (liked) {
+        spawnParticles(likeBtn);
+        // 全屏心形升起(全局特效);致谢卡片仅首次,避免连点刷屏
+        celebrateLike(likeBtn, !celebrated);
+        celebrated = true;
+        try { sessionStorage.setItem("like-celebrated", "1"); } catch (e) {}
       }
     });
   }
 
-  // ====== 访客统计(PV 每次访问 +1 / UV 首次访问 +1;腾讯云 SCF 全局计数 + localStorage 兜底) ======
-  var uvEl = document.getElementById("siteUv");
-  var pvEl = document.getElementById("sitePv");
-
-  // PV:本地先 +1 兜底展示,同时全局 +1 并覆盖为真实全局值
-  var LOCAL_PV_KEY = "site-pv-local";
-  if (pvEl) {
-    var localPv = 0;
-    try { var pv = parseInt(localStorage.getItem(LOCAL_PV_KEY), 10); if (!isNaN(pv) && pv >= 0) localPv = pv; } catch (e) {}
-    localPv += 1;
-    try { localStorage.setItem(LOCAL_PV_KEY, String(localPv)); } catch (e) {}
-    pvEl.textContent = String(localPv);
-    if (counterReady()) {
-      counterIncr("site-pv", 1).then(function (v) { if (typeof v === "number" && v >= 0) pvEl.textContent = String(Math.max(localPv, v)); }).catch(function () {});
-    }
-  }
-
-  // UV:本机首次访问时全局 +1;老访客只读全局值。本机兜底至少显示 1
-  if (uvEl) {
-    var uvSeen = false;
-    try { uvSeen = localStorage.getItem("site-uv-seen") === "1"; } catch (e) {}
-    uvEl.textContent = "1";
-    if (counterReady()) {
-      if (!uvSeen) {
-        counterIncr("site-uv", 1).then(function (v) { if (typeof v === "number" && v >= 0) uvEl.textContent = String(Math.max(1, v)); }).catch(function () {});
-        try { localStorage.setItem("site-uv-seen", "1"); } catch (e) {}
-      } else {
-        counterGet("site-uv").then(function (v) { if (typeof v === "number" && v >= 0) uvEl.textContent = String(Math.max(1, v)); }).catch(function () {});
-      }
-    }
-  }
+  // 访客统计已移除(腾讯云欠费停服);如需恢复,见 deploy/tencent-scf-counter*.py
 
   // Giscus 评论区跟随站点深 / 浅主题
   function syncGiscusTheme(theme) {
