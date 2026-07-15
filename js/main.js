@@ -276,7 +276,7 @@
     }
   }
 
-  // ====== 点赞(纯点赞:心形填充 / 弹跳 / 粒子 / 庆祝,无计数;本地记录是否已赞) ======
+  // ====== 点赞(连续点赞/鼓掌式:每次点击都是正向点赞,播放动画+全屏心形+致谢;不取消;无计数) ======
   var likeBtn = document.getElementById("likeBtn");
   if (likeBtn) {
     var LIKED_KEY = "site-liked";
@@ -290,15 +290,16 @@
     paint();
 
     likeBtn.addEventListener("click", function () {
-      liked = !liked;
-      try { localStorage.setItem(LIKED_KEY, liked ? "1" : "0"); } catch (e) {}
-      paint();
-      likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
-      if (liked) {
-        spawnParticles(likeBtn);
-        // 全屏心形升起 + 致谢卡片(每次点赞都给反馈,卡片单实例防堆叠)
-        celebrateLike(likeBtn, true);
+      // 连续点赞(鼓掌式):每次点击都是正向点赞,不切换取消,避免「要先取消才能再赞」的困惑
+      if (!liked) {
+        liked = true;
+        try { localStorage.setItem(LIKED_KEY, "1"); } catch (e) {}
+        paint();
       }
+      likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
+      spawnParticles(likeBtn);
+      // 全屏心形升起 + 致谢卡片(每次点赞都给反馈,卡片单实例防堆叠)
+      celebrateLike(likeBtn, true);
     });
   }
 
